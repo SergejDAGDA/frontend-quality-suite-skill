@@ -27,6 +27,8 @@ bundled:
 recommended:
   - name: impeccable
     provider: pbakaus/impeccable
+  - name: motion
+    provider: motiondivision/ai-kit
   - name: ui-designer
     provider: daymade/claude-code-skills
   - name: qa-expert
