@@ -100,6 +100,34 @@ Legacy user install directory:
 ~/.agents/skills/frontend-visual-qa/
 ```
 
+### Bundled frontend-accessibility-qa
+
+The plugin also bundles its own accessibility specialist in:
+
+```text
+skills/frontend-accessibility-qa/
+```
+
+This skill owns the suite's accessibility policy:
+
+- WCAG 2.2 Level A/AA is the hard gate when accessibility conformance is in scope;
+- APCA is optional perceptual guidance only;
+- design-time checks use scoped `DESIGN_GUARD`;
+- ordinary changes use `AFFECTED_AUDIT`;
+- substantial/release/accessibility work can use `FULL_AUDIT`;
+- advisory-only APCA findings cannot repeatedly reopen a completed WCAG remediation loop.
+
+Two external skills were reviewed as reference material while designing this bundled policy:
+
+- https://github.com/84emllc/claude-wcag-skill
+- https://github.com/thrillmade/agent-skills/tree/main/skills/apca-contrast
+
+They are **REFERENCE-ONLY** for this suite. Do not install them as runtime dependencies of `frontend-production-qa`, and do not let their own routing/authority rules override the bundled accessibility specialist.
+
+The normative WCAG source remains:
+
+https://www.w3.org/TR/WCAG22/
+
 ### Chrome DevTools MCP
 
 Current Codex registration:

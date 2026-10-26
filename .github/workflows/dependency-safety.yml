@@ -17,3 +17,6 @@ jobs:
       - name: Verify guided install remains read-only and conflict-aware
         shell: pwsh
         run: ./tests/test_dependency_install_plan.ps1
+      - name: Verify accessibility authority and bundled ownership
+        shell: pwsh
+        run: ./tests/test_accessibility_architecture.ps1

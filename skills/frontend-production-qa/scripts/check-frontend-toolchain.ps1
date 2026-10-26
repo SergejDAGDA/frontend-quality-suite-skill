@@ -141,7 +141,8 @@ Write-Host "--------------------------"
 foreach ($skill in @(
     "frontend-ui-engineering",
     "browser-testing-with-devtools",
-    "frontend-visual-qa"
+    "frontend-visual-qa",
+    "frontend-accessibility-qa"
 )) {
     if (-not (Test-SkillPayload -Name $skill)) {
         $runtimeReady = $false

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "frontend-production-qa",
-  "version": "1.3.0",
-  "description": "Production frontend orchestration with responsive verification, real-browser QA, regression closure, and optional design-reference search.",
+  "version": "1.4.0",
+  "description": "Production frontend orchestration with responsive, visual, accessibility, motion-aware, and real-browser QA.",
   "author": {
     "name": "Sergej DAGDA",
     "url": "https://github.com/SergejDAGDA"
@@ -16,6 +16,7 @@
     "responsive",
     "visual-regression",
     "motion",
+    "accessibility",
     "codex"
   ],
   "skills": "./skills/",
@@ -23,7 +24,7 @@
   "interface": {
     "displayName": "Frontend Production QA",
     "shortDescription": "Production frontend workflow with real-browser and responsive QA",
-    "longDescription": "Orchestrates frontend implementation, responsive verification, rendered visual QA, regression closure, shared-component checks, conditional Motion guidance, and review gates. Includes optional Inspo MCP references for new or substantially redesigned interfaces.",
+    "longDescription": "Orchestrates frontend implementation, responsive verification, rendered visual QA, WCAG 2.2 accessibility closure, regression closure, shared-component checks, conditional Motion guidance, and review gates. Includes optional Inspo MCP references for new or substantially redesigned interfaces.",
     "developerName": "Sergej DAGDA",
     "category": "Developer Tools",
     "capabilities": [

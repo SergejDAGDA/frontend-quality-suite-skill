@@ -93,6 +93,7 @@ foreach ($spec in $packages) {
 }
 
 Write-Host "frontend-visual-qa: BUNDLED in frontend-production-qa; do not compare to daymade upstream."
+Write-Host "frontend-accessibility-qa: BUNDLED in frontend-production-qa; update only with this plugin."
 Write-Host "Chrome DevTools MCP: effective npx @latest runtime version UNKNOWN without runtime evidence."
 Write-Host "Impeccable: installed/runtime identity UNKNOWN; npx check is intentionally not invoked."
 Write-Host "UNKNOWN is never treated as CURRENT or OUTDATED. No changes made."

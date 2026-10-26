@@ -2,13 +2,15 @@
 
 [English version](README.md)
 
-Переносимый Agent Skill-плагин для production frontend-разработки и QA. Он включает два отдельных навыка: `frontend-production-qa` для координации и `frontend-visual-qa` для визуального аудита.
+Переносимый Agent Skill-плагин для production frontend-разработки и QA. Он включает оркестратор `frontend-production-qa` и два отдельных bundled specialist: `frontend-visual-qa` для визуального аудита и `frontend-accessibility-qa` для accessibility.
+
+`frontend-accessibility-qa` также bundled и поддерживается в этом репозитории. Нормативная основа — W3C WCAG 2.2 Recommendation; APCA остаётся advisory и не становится конкурирующим compliance gate.
 
 Он не заменяет специализированные навыки. Его задача — оркестрировать их, выбирать глубину проверки browser-facing изменений и определять, когда задача действительно подтверждена достаточными доказательствами.
 
-**GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Два Skill ID:** `$frontend-production-qa` и `$frontend-visual-qa` (без изменений). ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
+**GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Bundled Skill ID:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
 
-**Версия-кандидат:** `1.3.0` в отдельном Motion PR, построенном поверх migration PR репозитория. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
+**Версия-кандидат:** `1.4.0` в accessibility-architecture PR. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
 
 ## Зачем он нужен
 
@@ -106,12 +108,27 @@ Installer может изменять skill files и hosted MCP configuration, �
 
 Для простых hover/focus/press/fade/loading эффектов нужно предпочитать CSS, если его достаточно. Нельзя добавлять Motion runtime только из-за наличия agent skill. Нужно соблюдать reduced-motion/accessibility требования и проверять существенные animated states в реальном браузере.
 
+## Bundled accessibility specialist
+
+Suite включает собственный `frontend-accessibility-qa`, который является accessibility authority для browser-facing работы.
+
+Когда accessibility conformance входит в scope, **WCAG 2.2 Level A/AA является hard gate**. APCA используется только как дополнительная perceptual design-подсказка и не может отменить WCAG failure.
+
+Чтобы не запускать полный аудит после каждой мелкой правки, используются три режима:
+
+- `DESIGN_GUARD` при выборе цветов, semantics, focus, target size и interaction;
+- `AFFECTED_AUDIT` после обычных scoped изменений;
+- `FULL_AUDIT` для существенного нового UI, явного WCAG-аудита, широких accessibility изменений или release acceptance с accessibility.
+
+Accessibility specialist поддерживается внутри этого репозитория. Внешние WCAG/APCA agent skills используются только как reference sources и не являются runtime dependencies.
+
 ## Основной workflow
 
 ```text
 правила проекта
   -> анализ и воспроизведение
   -> optional design references, если действительно нужны
+  -> accessibility design guard, если нужен
   -> frontend implementation
   -> conditional Motion specialist, если нужен
   -> design-quality слой, если нужен
@@ -119,6 +136,7 @@ Installer может изменять skill files и hosted MCP configuration, �
   -> реальный браузер
   -> responsive verification
   -> rendered visual QA
+  -> accessibility closure
   -> regression closure
   -> условные review/security/performance/release gates
   -> доказательства завершения
@@ -162,7 +180,8 @@ Workflow ожидает:
 
 - `frontend-ui-engineering`
 - `browser-testing-with-devtools`
-- `frontend-visual-qa`
+- bundled `frontend-visual-qa`
+- bundled `frontend-accessibility-qa`
 - Chrome DevTools MCP
 
 Первые два навыка берутся из [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).

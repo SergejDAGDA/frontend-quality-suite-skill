@@ -8,4 +8,6 @@ Do not apply this workflow to backend-only, database-only, infrastructure-only, 
 
 Keep project-specific architecture, product, legal, accessibility, design, release and project-memory constraints in this `AGENTS.md`.
 
+Let `frontend-production-qa` route accessibility-sensitive work through the bundled `frontend-accessibility-qa` specialist. WCAG 2.2 A/AA remains the hard gate when in scope; APCA is advisory and must not override WCAG or established project requirements.
+
 Do not install, update, or repair third-party frontend skills during normal development work. Toolchain bootstrap and updates are explicit maintenance operations.

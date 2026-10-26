@@ -2,13 +2,13 @@
 
 [Русская версия](README.ru.md)
 
-A reusable Agent Skill plugin for production-grade frontend implementation and QA, bundling the `frontend-production-qa` orchestrator and the separate `frontend-visual-qa` audit skill.
+A reusable Agent Skill plugin for production-grade frontend implementation and QA, bundling the `frontend-production-qa` orchestrator plus separate `frontend-visual-qa` and `frontend-accessibility-qa` audit specialists.
 
 It does not replace specialist skills. It orchestrates them, defines how deeply a browser-facing change must be verified, and decides when the work has enough evidence to be considered complete.
 
-**GitHub repository:** `SergejDAGDA/frontend-quality-suite-skill`. **Installed plugin ID:** `frontend-production-qa@codex-frontend-production-qa` (unchanged). **Bundled Skill IDs:** `$frontend-production-qa`, `$frontend-visual-qa` (unchanged). The Marketplace ID intentionally retains its historical name to avoid an unapproved change to an existing native Codex registration.
+**GitHub repository:** `SergejDAGDA/frontend-quality-suite-skill`. **Installed plugin ID:** `frontend-production-qa@codex-frontend-production-qa` (unchanged). **Bundled Skill IDs:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. The Marketplace ID intentionally retains its historical name to avoid an unapproved change to an existing native Codex registration.
 
-**Version candidate:** `1.3.0` in the Motion integration PR stacked on the repository-identity migration. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
+**Version candidate:** `1.4.0` in the accessibility-architecture PR. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
 
 ## Why this exists
 
@@ -106,12 +106,27 @@ The installer can write skill files and hosted MCP configuration, so it must rem
 
 Prefer CSS for simple hover/focus/press/fade/loading effects when CSS is sufficient. Do not add the Motion runtime package solely because the agent skill is available. Respect reduced-motion/accessibility requirements and verify relevant animated states in the browser.
 
+## Bundled accessibility specialist
+
+The suite bundles `frontend-accessibility-qa` as the accessibility authority for browser-facing work.
+
+It uses **WCAG 2.2 Level A/AA as the hard gate** when accessibility conformance is in scope. APCA is supported only as optional perceptual design guidance and cannot waive a WCAG failure.
+
+Three audit depths prevent over-testing:
+
+- `DESIGN_GUARD` for color, semantics, focus, target size and interaction choices while work is being designed;
+- `AFFECTED_AUDIT` for normal scoped changes after implementation;
+- `FULL_AUDIT` for substantial new UI, explicit WCAG audits, broad accessibility changes, or release acceptance that includes accessibility.
+
+The accessibility specialist is maintained in this repository. External WCAG/APCA agent skills are reference sources, not runtime dependencies.
+
 ## Core workflow
 
 ```text
 project rules
   -> understand/reproduce
   -> optional design references when warranted
+  -> accessibility design guard when relevant
   -> frontend implementation
   -> conditional Motion specialist when relevant
   -> design-quality layer when relevant
@@ -119,6 +134,7 @@ project rules
   -> real browser
   -> responsive verification
   -> rendered visual QA
+  -> accessibility closure
   -> regression closure
   -> conditional review/security/performance/release gates
   -> completion evidence
@@ -162,12 +178,15 @@ The workflow expects:
 
 - `frontend-ui-engineering`
 - `browser-testing-with-devtools`
-- `frontend-visual-qa`
+- bundled `frontend-visual-qa`
+- bundled `frontend-accessibility-qa`
 - Chrome DevTools MCP
 
 The first two come from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).
 
 `frontend-visual-qa` is bundled in this repository. Its original upstream source is [daymade/claude-code-skills](https://github.com/daymade/claude-code-skills), but the maintained Codex-adapted copy here is the version used by this plugin.
+
+`frontend-accessibility-qa` is also bundled and maintained here. It uses the W3C [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) as its normative accessibility baseline and keeps APCA advisory rather than making it a competing compliance gate.
 
 Chrome DevTools MCP comes from [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp).
 

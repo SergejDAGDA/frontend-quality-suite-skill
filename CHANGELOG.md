@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0
+
+Bundled accessibility architecture:
+
+- Add `frontend-accessibility-qa` as a bundled, version-consistent accessibility specialist owned by this repository.
+- Use WCAG 2.2 Level A/AA as the hard accessibility gate when conformance is in scope.
+- Add three audit depths: `DESIGN_GUARD`, `AFFECTED_AUDIT`, and `FULL_AUDIT`.
+- Add design-time contrast/state checks and post-implementation accessibility closure without creating a second responsive matrix.
+- Keep APCA optional and advisory; it cannot waive WCAG failures or repeatedly reopen a completed hard-gate remediation loop.
+- Treat 84EM `wcag-2.2-aa` and Thrillmade `apca-contrast` as design/reference inputs only, not runtime dependencies.
+- Add maintained WCAG A/AA checklist, contrast arbitration policy, evidence/scope guidance, and architecture safety tests.
+- Extend readiness, install-planning and maintenance messaging to recognize the new bundled skill.
+
 ## 1.3.0
 
 Conditional Motion specialist integration:

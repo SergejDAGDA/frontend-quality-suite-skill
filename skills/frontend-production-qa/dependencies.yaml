@@ -17,6 +17,8 @@ bundled:
   skills:
     - name: frontend-visual-qa
       path: ./skills/frontend-visual-qa
+    - name: frontend-accessibility-qa
+      path: ./skills/frontend-accessibility-qa
   mcp:
     - name: inspo
       provider: Nutlope/inspo
