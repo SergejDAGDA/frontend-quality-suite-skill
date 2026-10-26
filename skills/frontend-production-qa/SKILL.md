@@ -63,9 +63,38 @@ For ordinary bug fixes, responsive regressions, faithful existing-design work, a
 
 If the bundled Inspo MCP is unavailable, report that limitation when reference research was actually needed. Its absence does not block ordinary frontend regression work.
 
+## Motion and interaction specialist
+
+When the external `motion` skill is installed, use it conditionally for work that materially creates or changes:
+
+- animation systems or transition orchestration;
+- enter/exit animation and presence;
+- shared-layout or layout animation;
+- gestures, drag, swipe, or reorder behavior;
+- scroll-linked or scroll-triggered motion;
+- spring-based interaction;
+- animation performance, jank, or layout-thrash diagnosis;
+- Motion API usage or upgrades.
+
+Prefer project-native CSS when CSS is sufficient, especially for simple hover, focus, press, fade, loading, or similarly small effects.
+
+Do not introduce the Motion runtime solely because the specialist skill exists. Follow the project's existing framework, animation stack, package version, architecture, and dependency policy.
+
+For Motion-specific implementation, prefer the specialist's current upstream guidance rather than relying on stale API memory. If the specialist is unavailable, continue with the project's existing animation approach and report reduced specialist coverage only when it materially affects the task.
+
+For any animation or interaction change:
+
+- respect `prefers-reduced-motion` and project accessibility policy;
+- verify keyboard and touch behavior when relevant;
+- verify the start state, active transition, interruption/reversal when meaningful, and settled end state;
+- treat geometry, sizing, wrapping, visibility, breakpoint, or shared-layout effects as Class A;
+- treat animation-related layout fixes as normal regression-closure changes that invalidate prior visual verification for the affected surface.
+
 ## Recommended and optional layers
 
 Use Impeccable for meaningful design/layout/typography/hierarchy/responsive critique or polish when it is installed and relevant.
+
+Use the external `motion` specialist only for the conditional motion/interaction cases above. It is recommended, not required or bundled.
 
 Optional locally available integrations may include:
 
