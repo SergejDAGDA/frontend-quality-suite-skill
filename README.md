@@ -94,7 +94,7 @@ For animation-heavy frontend work, the orchestrator can use the official externa
 
 Use it conditionally for substantial animation, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, Motion API work, or animation-performance diagnosis.
 
-It is **recommended, not required or bundled**. The suite checks Motion only when the task triggers it. Freshness is read from Motion's live author/distribution sources; no Motion version is pinned in this repository.
+It is **recommended, not required or bundled**. The suite checks Motion only when the task triggers it. The current installable Motion release is resolved from the npm `latest` dist-tag; no Motion version is pinned in this repository.
 
 When Motion is missing or differs from the current author payload, the orchestrator offers the exact provider update/install before use. Mutation still requires explicit user approval.
 
@@ -150,9 +150,9 @@ After classifying a task, the suite derives the exact required/triggered special
 .\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
 ```
 
-The registry in `skills/frontend-production-qa/specialists.json` stores only provider identity, repository, install channel and live version/payload sources. It intentionally stores **no current external version numbers**.
+The registry in `skills/frontend-production-qa/specialists.json` stores only provider identity, repository, install channel, and a moving **current channel**. It intentionally stores **no current external version numbers**.
 
-Freshness is checked against the author's current source at runtime. For npm-distributed providers such as Impeccable and Motion, the author's manifest is also compared with the current official distribution metadata so an unpublished/de-synchronised source is not silently treated as installable.
+For npm-distributed providers such as Impeccable and Motion, the configured npm dist-tag `latest` is the authoritative current installable release. The repository default branch remains useful for provenance, documentation, and payload/reference checks, but its package version is not required to equal npm `latest`.
 
 The preflight distinguishes states including `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` and evidence/source unknown states.
 
@@ -283,7 +283,7 @@ These commands are read-only. When preflight finds a missing/stale selected spec
 
 The older `check-frontend-toolchain.ps1`, `plan-frontend-dependencies.ps1`, `bootstrap-frontend-toolchain.ps1`, and `update-frontend-toolchain.ps1` remain compatibility/read-only helpers. They do not replace live task-scoped preflight.
 
-Normal frontend work must never silently mutate third-party dependencies. It must, however, **proactively surface** missing/stale specialists that the selected workflow needs and offer the correct owner-specific install/update. Duplicate IDs, source divergence, unknown provenance, or unverifiable current versions stop automatic mutation.
+Normal frontend work must never silently mutate third-party dependencies. It must, however, **proactively surface** missing/stale specialists that the selected workflow needs and offer the correct owner-specific install/update. Duplicate IDs, unknown provenance, or unverifiable current-channel evidence stop automatic mutation.
 
 Review [toolchain maintenance](skills/frontend-production-qa/references/toolchain-maintenance.md) before installation/update. A cached file alone does not prove active-session loading.
 
