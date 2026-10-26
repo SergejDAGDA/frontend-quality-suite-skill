@@ -22,6 +22,7 @@ foreach ($script in @($preflightPath, $updateCheckPath, $bootstrapPath)) {
         [ref]$tokens,
         [ref]$errors
     )
+
     if (@($errors).Count -gt 0) {
         throw "PowerShell syntax errors in $script : $(@($errors) -join '; ')"
     }
@@ -34,8 +35,12 @@ if (Test-Path -LiteralPath $removedManagerPath) {
 $registryRaw = Get-Content -LiteralPath $registryPath -Raw
 $registry = $registryRaw | ConvertFrom-Json
 
+if ($registry.schema_version -ne 2) {
+    throw "specialists.json is not on moving-channel schema v2"
+}
+
 if ($registry.policy.task_scoped_preflight -ne $true -or
-    $registry.policy.live_author_source_required -ne $true -or
+    $registry.policy.live_current_channel_required -ne $true -or
     $registry.policy.pinned_external_versions_forbidden -ne $true -or
     $registry.policy.mutation_requires_explicit_user_approval -ne $true) {
     throw "Specialist registry policy invariants are incomplete"
@@ -43,6 +48,11 @@ if ($registry.policy.task_scoped_preflight -ne $true -or
 
 if ($registryRaw -match '(?<![A-Za-z0-9])v?\d+\.\d+\.\d+(?![A-Za-z0-9])') {
     throw "Pinned external semantic version found in specialists.json"
+}
+
+if ($registryRaw -match '"author_version"' -or
+    $registryRaw -match '"distribution_version"') {
+    throw "Legacy dual-source version fields returned to specialists.json"
 }
 
 $expected = @{
@@ -75,6 +85,7 @@ foreach ($key in $expected.Keys) {
     }
 
     $row = $rows[0]
+
     if ($row.repository -ne $expected[$key].repository -or
         $row.channel -ne $expected[$key].channel) {
         throw "Registry owner/channel drift for $key"
@@ -86,9 +97,10 @@ foreach ($key in $expected.Keys) {
         }
     }
 
-    if (-not $row.author_version.url -or
-        $row.author_version.url -notmatch '^https://raw\.githubusercontent\.com/') {
-        throw "Live author version source missing for $key"
+    if (-not $row.current_channel.kind -or
+        -not $row.current_channel.url -or
+        -not $row.current_channel.property) {
+        throw "Moving current channel missing for $key"
     }
 }
 
@@ -96,6 +108,13 @@ $agent = @($registry.specialists | Where-Object key -eq "agent-skills")[0]
 $taste = @($registry.specialists | Where-Object key -eq "taste")[0]
 $impeccable = @($registry.specialists | Where-Object key -eq "impeccable")[0]
 $motion = @($registry.specialists | Where-Object key -eq "motion")[0]
+
+foreach ($pluginSpec in @($agent, $taste)) {
+    if ($pluginSpec.current_channel.kind -ne "author-manifest" -or
+        $pluginSpec.current_channel.url -notmatch '^https://raw\.githubusercontent\.com/') {
+        throw "Codex-plugin current channel must be an author-owned live manifest for $($pluginSpec.key)"
+    }
+}
 
 if ($agent.plugin_id -ne "agent-skills@agent-skills" -or
     $agent.marketplace -ne "agent-skills" -or
@@ -110,9 +129,10 @@ if ($taste.plugin_id -ne "taste-skill@taste-skill" -or
 }
 
 foreach ($npmSpec in @($impeccable, $motion)) {
-    if (-not $npmSpec.distribution_version.url -or
-        $npmSpec.distribution_version.url -notmatch '^https://registry\.npmjs\.org/.+/latest$') {
-        throw "Current npm distribution source missing for $($npmSpec.key)"
+    if ($npmSpec.current_channel.kind -ne "npm-dist-tag" -or
+        $npmSpec.current_channel.tag -ne "latest" -or
+        $npmSpec.current_channel.url -notmatch '^https://registry\.npmjs\.org/.+/latest$') {
+        throw "npm specialist does not use the latest dist-tag as current installable channel: $($npmSpec.key)"
     }
 
     foreach ($action in @("install", "update")) {
@@ -123,29 +143,43 @@ foreach ($npmSpec in @($impeccable, $motion)) {
     }
 }
 
-if ($motion.local_version.kind -ne "payload-hash" -or -not $motion.author_payload.url) {
+if ($motion.local_version.kind -ne "payload-hash" -or
+    -not $motion.author_payload.url) {
     throw "Motion must use author payload comparison instead of an invented local semantic version"
 }
 
 $preflight = Get-Content -LiteralPath $preflightPath -Raw
+
 foreach ($requiredText in @(
-    "Get-MarketplaceEvidence",
+    "Test-CurrentChannel",
     "INSTALLED_CURRENT",
     "UPDATE_AVAILABLE",
     "UPDATE_RECOMMENDED",
     "PROVENANCE_UNKNOWN",
-    "SOURCE_DIVERGENCE",
     "UNKNOWN_REMOTE",
     "UNKNOWN_DISTRIBUTION",
-    "UNKNOWN_LOCAL"
+    "UNKNOWN_LOCAL",
+    "current_channel",
+    "current_version"
 )) {
     if ($preflight -notmatch [regex]::Escape($requiredText)) {
         throw "Preflight invariant missing: $requiredText"
     }
 }
 
+foreach ($forbiddenText in @(
+    "Test-AuthorDistribution",
+    "SOURCE_DIVERGENCE",
+    "author_version",
+    "distribution_version"
+)) {
+    if ($preflight -match [regex]::Escape($forbiddenText)) {
+        throw "Legacy dual-source currentness logic remains in preflight: $forbiddenText"
+    }
+}
+
 if ($preflight -notmatch 'Invoke-RestMethod') {
-    throw "Preflight does not read live remote evidence"
+    throw "Preflight does not read live current-channel evidence"
 }
 
 $updateCheck = Get-Content -LiteralPath $updateCheckPath -Raw
@@ -155,9 +189,11 @@ if ($updateCheck -notmatch 'preflight-frontend-specialists\.ps1' -or
 }
 
 $orchestrator = Get-Content -LiteralPath $orchestratorPath -Raw
+
 foreach ($requiredText in @(
     "Specialist preflight and live-version policy",
-    "Current-version truth must be read from the author's live source at preflight time",
+    "moving current provider channel",
+    "npm dist-tag",
     "INSTALLED_NOT_ACTIVE",
     "When an update is available, do not silently keep using the stale specialist",
     "execute the provider's official channel directly",
@@ -174,9 +210,11 @@ if ($orchestrator -match 'manage-frontend-specialist\.ps1') {
 
 $maintenance = Get-Content -LiteralPath $maintenancePath -Raw
 if ($maintenance -notmatch 'Do not maintain a second custom package manager' -or
-    $maintenance -notmatch 'Only after explicit approval' -or
+    $maintenance -notmatch 'moving current provider channel' -or
+    $maintenance -notmatch 'dist-tag' -or
+    $maintenance -match 'SOURCE_DIVERGENCE' -or
     $maintenance -match 'manage-frontend-specialist\.ps1') {
-    throw "Maintenance policy does not preserve the simplified provider-native mutation model"
+    throw "Maintenance policy does not preserve moving-channel/provider-native mutation rules"
 }
 
 $manifest = Get-Content -LiteralPath $dependenciesPath -Raw
@@ -196,15 +234,19 @@ $readme = Get-Content -LiteralPath $readmePath -Raw
 $readmeRu = Get-Content -LiteralPath $readmeRuPath -Raw
 
 if ($readme -notmatch 'Live specialist preflight' -or
+    $readme -notmatch 'npm dist-tag' -or
     $readme -notmatch 'no current external version numbers' -or
+    $readme -match 'source divergence' -or
     $readme -match 'manage-frontend-specialist\.ps1') {
-    throw "English README lacks the simplified live-version policy"
+    throw "English README lacks the moving-channel policy"
 }
 
 if ($readmeRu -notmatch 'Live specialist preflight' -or
+    $readmeRu -notmatch 'npm dist-tag' -or
     $readmeRu -notmatch 'Текущие номера версий внешних skills' -or
+    $readmeRu -match 'source divergence' -or
     $readmeRu -match 'manage-frontend-specialist\.ps1') {
-    throw "Russian README lacks the simplified live-version policy"
+    throw "Russian README lacks the moving-channel policy"
 }
 
 Write-Host "Specialist live-preflight fixtures PASS."
