@@ -275,8 +275,8 @@ function New-Result {
         channel = $Spec.channel
         status = "UNKNOWN"
         installed_version = $null
-        author_version = $null
-        distribution_version = $null
+        current_version = $null
+        current_channel = $null
         session_load = "UNVERIFIED"
         fresh_session_required = [bool]$Spec.fresh_session_required
         detail = ""
@@ -285,38 +285,33 @@ function New-Result {
     }
 }
 
-function Test-AuthorDistribution {
+function Test-CurrentChannel {
     param(
         $Spec,
         [System.Collections.IDictionary]$Result
     )
 
-    if ($Spec.author_version) {
-        $Result.author_version = Get-LiveJsonValue -Url $Spec.author_version.url -Property $Spec.author_version.property
-    }
-
-    if ($Spec.distribution_version) {
-        $Result.distribution_version = Get-LiveJsonValue -Url $Spec.distribution_version.url -Property $Spec.distribution_version.property
-    }
-
-    if ($Spec.author_version -and -not $Result.author_version) {
+    if (-not $Spec.current_channel) {
         $Result.status = "UNKNOWN_REMOTE"
-        $Result.detail = "Could not read the current version from the author's live source."
-        $Result.suggested_action = "Do not claim this specialist is current; retry the live author check."
+        $Result.detail = "No live current channel is configured for this external specialist."
+        $Result.suggested_action = "Do not claim this specialist is current until an authoritative moving channel is defined."
         return $false
     }
 
-    if ($Spec.distribution_version -and -not $Result.distribution_version) {
-        $Result.status = "UNKNOWN_DISTRIBUTION"
-        $Result.detail = "Author version is available but the official distribution version could not be read."
-        $Result.suggested_action = "Do not mutate this specialist until author and distribution evidence can be compared."
-        return $false
-    }
+    $Result.current_channel = [string]$Spec.current_channel.kind
+    $Result.current_version = Get-LiveJsonValue -Url $Spec.current_channel.url -Property $Spec.current_channel.property
 
-    if ($Spec.distribution_version -and $Result.author_version -ne $Result.distribution_version) {
-        $Result.status = "SOURCE_DIVERGENCE"
-        $Result.detail = "The author's current manifest and the official install distribution report different versions."
-        $Result.suggested_action = "Do not auto-select an update; inspect the author's release/install guidance."
+    if (-not $Result.current_version) {
+        if ($Spec.current_channel.kind -eq "npm-dist-tag") {
+            $Result.status = "UNKNOWN_DISTRIBUTION"
+            $Result.detail = "Could not resolve the current npm dist-tag for this specialist."
+            $Result.suggested_action = "Do not claim this specialist is current; retry the official distribution check."
+        }
+        else {
+            $Result.status = "UNKNOWN_REMOTE"
+            $Result.detail = "Could not read the current version from the provider's live channel."
+            $Result.suggested_action = "Do not claim this specialist is current; retry the live provider check."
+        }
         return $false
     }
 
@@ -327,7 +322,7 @@ function Inspect-CodexPluginSpecialist {
     param($Spec)
 
     $result = New-Result -Spec $Spec
-    if (-not (Test-AuthorDistribution -Spec $Spec -Result $result)) {
+    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
         return [pscustomobject]$result
     }
 
@@ -398,22 +393,22 @@ function Inspect-CodexPluginSpecialist {
         return [pscustomobject]$result
     }
 
-    $comparison = Compare-VersionText -Installed $result.installed_version -Author $result.author_version
+    $comparison = Compare-VersionText -Installed $result.installed_version -Author $result.current_version
 
     switch ($comparison) {
         "EQUAL" {
             $result.status = "INSTALLED_CURRENT"
-            $result.detail = "Installed native plugin version matches the author's live manifest."
+            $result.detail = "Installed native plugin version matches the current provider channel."
             $result.suggested_action = "Resolve the exact Skill ID in the current session before invoking it."
         }
         "OLDER" {
             $result.status = "UPDATE_AVAILABLE"
-            $result.detail = "Installed native plugin version is older than the author's live manifest."
+            $result.detail = "Installed native plugin version is older than the current provider channel."
             $result.suggested_action = "Offer a targeted author-owned plugin update before use."
         }
         "NEWER" {
             $result.status = "DIFFERENT"
-            $result.detail = "Installed version is newer than the author's current live manifest."
+            $result.detail = "Installed version is newer than the current provider channel."
             $result.suggested_action = "Do not downgrade automatically; inspect provenance."
         }
         default {
@@ -438,7 +433,7 @@ function Inspect-DirectSkillSpecialist {
     param($Spec)
 
     $result = New-Result -Spec $Spec
-    if (-not (Test-AuthorDistribution -Spec $Spec -Result $result)) {
+    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
         return [pscustomobject]$result
     }
 
@@ -472,17 +467,17 @@ function Inspect-DirectSkillSpecialist {
             return [pscustomobject]$result
         }
 
-        $comparison = Compare-VersionText -Installed $record.Version -Author $result.author_version
+        $comparison = Compare-VersionText -Installed $record.Version -Author $result.current_version
 
         switch ($comparison) {
             "EQUAL" {
                 $result.status = "INSTALLED_CURRENT"
-                $result.detail = "Installed skill version matches the author's live manifest."
+                $result.detail = "Installed skill version matches the current provider channel."
                 $result.suggested_action = "Resolve the Skill ID in the current session before use."
             }
             "OLDER" {
                 $result.status = "UPDATE_AVAILABLE"
-                $result.detail = "Installed skill version is older than the author's live manifest."
+                $result.detail = "Installed skill version is older than the current provider channel."
                 $result.suggested_action = "Offer the author's targeted update before use."
             }
             default {
@@ -571,7 +566,7 @@ if ($Json) {
 
 Write-Host "Frontend Production QA - task-scoped specialist preflight"
 Write-Host "========================================================="
-Write-Host "Current versions come from live author/distribution sources; no external versions are pinned here."
+Write-Host "Current installable versions come from live moving provider channels; no external versions are pinned here."
 
 foreach ($row in $results) {
     Write-Host ""
@@ -582,11 +577,11 @@ foreach ($row in $results) {
     if ($row.installed_version) {
         Write-Host "  installed: $($row.installed_version)"
     }
-    if ($row.author_version) {
-        Write-Host "  author current: $($row.author_version)"
+    if ($row.current_channel) {
+        Write-Host "  current channel: $($row.current_channel)"
     }
-    if ($row.distribution_version) {
-        Write-Host "  distribution current: $($row.distribution_version)"
+    if ($row.current_version) {
+        Write-Host "  current version: $($row.current_version)"
     }
 
     Write-Host "  session load: $($row.session_load)"
