@@ -31,13 +31,70 @@ Expected capabilities:
 
 `frontend-visual-qa` and `frontend-accessibility-qa` are bundled with this plugin. Use the bundled copies as the version-consistent visual and accessibility QA layers; do not substitute separately installed upstream copies without reviewing the diff first.
 
-If a required specialist skill is missing:
-
-1. do not pretend that phase ran;
-2. use an equivalent direct procedure when possible;
-3. report the missing dependency and reduced coverage.
+External specialist availability and freshness must be established before first use in each task. Do not silently skip a required or task-triggered specialist because the user did not know to ask about it.
 
 If a real browser cannot be used, full frontend verification is blocked.
+
+## Specialist preflight and live-version policy
+
+After classifying the task, derive the exact external specialist set that the task needs.
+
+Always include the required external base capabilities:
+
+- `frontend-ui-engineering`;
+- `browser-testing-with-devtools`.
+
+Add conditional recommended specialists only when their routing triggers:
+
+- `design-taste-frontend` for qualifying art-direction work;
+- `impeccable` for qualifying design critique/polish or design direction when Taste was not selected;
+- `motion` for qualifying substantial motion/interaction work.
+
+Bundled `frontend-visual-qa` and `frontend-accessibility-qa` are versioned with this plugin and must not be checked against floating external copies.
+
+Before first use of any external specialist in the task, run:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+Batch multiple selected Skill IDs when useful. Run the live check once per selected provider per session unless the task scope changes or a mutation occurs.
+
+The preflight registry stores **identity, owner, install channel, and live author/distribution source only**. It must not pin a remembered external version. Current-version truth must be read from the author's live source at preflight time. Do not use versions remembered from this file, README text, changelog history, prior conversations, or model knowledge as freshness evidence.
+
+Interpret preflight states as follows:
+
+- `INSTALLED_CURRENT` — package/payload matches the current author source; still resolve the exact Skill ID in the current Codex session before claiming it ran;
+- `UPDATE_AVAILABLE` / `UPDATE_RECOMMENDED` — proactively tell the user before use and offer the exact provider-specific update;
+- `MISSING` / `MARKETPLACE_MISSING` — proactively tell the user and offer the exact author-owned installation;
+- `DISABLED` — do not pretend the specialist is usable; enable through the native provider flow and start a fresh session;
+- `CONFLICT` — duplicate IDs or ownership disagreement; do not install/update/use the ambiguous specialist until resolved;
+- `PROVENANCE_UNKNOWN`, `SOURCE_DIVERGENCE`, `UNKNOWN_REMOTE`, `UNKNOWN_DISTRIBUTION`, `UNKNOWN_LOCAL`, or `DIFFERENT` — do not claim currentness and do not mutate automatically; resolve evidence/provenance first.
+
+A cache hit or readable `SKILL.md` is not proof that the current Codex Desktop session loaded that specialist. Before invoking a specialist, resolve the exact Skill ID in the active session. If package-level preflight passes but the current session cannot resolve it, classify it operationally as `INSTALLED_NOT_ACTIVE`, require a fresh session, and do not claim that specialist phase ran.
+
+When an update is available, do not silently keep using the stale specialist. Offer the update first. If the user declines:
+
+- for a required specialist, continue only with explicitly reduced/stale coverage and do not claim current-toolchain verification;
+- for a conditional recommended specialist, skip it or use a bounded fallback and report reduced specialist coverage.
+
+When installation/update is approved, plan the exact component first:
+
+```powershell
+.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
+```
+
+Only after explicit approval for that exact specialist/action may the orchestrator run the same command with `-Apply`.
+
+After any mutation:
+
+1. run package-level postflight;
+2. start a fresh Codex session when required;
+3. re-run live preflight;
+4. resolve the exact Skill ID in that fresh session;
+5. only then rely on the specialist.
+
+Never update all marketplaces/packages as a side effect of a frontend task.
 
 ## Design references with bundled Inspo
 
@@ -74,7 +131,7 @@ Choose in this order:
 
 Do not let Taste and Impeccable independently establish competing visual directions for the same task.
 
-Use `design-taste-frontend` when it is installed and the task materially asks for:
+Use `design-taste-frontend` when the task materially asks for:
 
 - a new landing page, marketing/public-facing page, portfolio, campaign, product page, or visual showcase that needs a distinctive art direction;
 - a deliberate redesign or restyle that is allowed to replace the existing visual world;
@@ -160,7 +217,7 @@ Do not run a full audit after every trivial frontend edit. Promote scope when sh
 
 ## Recommended and optional layers
 
-Use Impeccable for meaningful design/layout/typography/hierarchy/responsive critique or polish when it is installed and relevant. If Taste established the art direction, constrain Impeccable to critique/polish inside that direction rather than starting a competing redesign.
+Use Impeccable for meaningful design/layout/typography/hierarchy/responsive critique or polish when relevant and after task-scoped preflight. If Taste established the art direction, constrain Impeccable to critique/polish inside that direction rather than starting a competing redesign.
 
 Use the external `motion` specialist only for the conditional motion/interaction cases above. It is recommended, not required or bundled.
 
@@ -176,7 +233,7 @@ Never let optional tools override project rules.
 
 ## Toolchain mutation policy
 
-Normal frontend work may perform local presence/readiness checks.
+Task-scoped read-only specialist preflight is mandatory when an external specialist is selected.
 
 Normal frontend work must not silently:
 
@@ -184,39 +241,35 @@ Normal frontend work must not silently:
 - update dependencies;
 - replace third-party skills;
 - initialize Impeccable;
-- approve hooks.
+- approve hooks;
+- register an unverified marketplace;
+- resolve a duplicate Skill ID by traversal order.
 
-Bootstrap and updates are explicit maintenance operations only.
+A missing or stale specialist is a user-visible preflight finding, not a reason to quietly omit that phase.
 
 ### Dependency installation and update handoff
 
-On a **requested installation** of this plugin, or if required specialist capabilities
-are missing, inspect `dependencies.yaml` and the installed skill/plugin inventory.
-Use `scripts/plan-frontend-dependencies.ps1` for an initial read-only native CLI
-inventory, local marketplace Git-origin/catalog verification and native
-`/plugins` handoff; treat UNKNOWN and CONFLICT as stop conditions. Do not
-construct undocumented deep links or trust the marketplace name alone. Do not execute the legacy multi-component bootstrap actions.
-Classify REQUIRED, BUNDLED, RECOMMENDED, OPTIONAL_UNMANAGED and REFERENCE-ONLY
-entries; a mention in a README is not an install instruction. Identify existing
-packages, duplicate `SKILL.md` IDs, source/owner and install channel. Offer one
-grouped plan for missing REQUIRED components and ask for the owner's approval
-before any install, MCP registration or hook change. Recommended/optional
-components require an explicit separate choice; no silent additions.
+`scripts/preflight-frontend-specialists.ps1` is the primary task-time check for required and triggered recommended specialists. It reads the current author source live and distinguishes package availability, freshness, duplicate IDs, marketplace provenance, and evidence gaps.
 
-On a **user-requested update check**, run the read-only checks, compare only
-verified installed package identities against upstream release/revision evidence,
-and report `CURRENT`, `DIFFERENT`, `MISSING`, `AMBIGUOUS` or `UNKNOWN`.
-A cache hit or a CLI process listing is not proof of activation in the current
-Codex Desktop session. Failed network access, indeterminate revisions and
-unpinned `@latest` runtimes are `UNKNOWN`, not `CURRENT` or `OUTDATED`.
+`scripts/manage-frontend-specialist.ps1` is the only task-time mutation path documented by this skill. It:
 
-On an **approved update**, operate only on the exact selected owning package.
-Never fall back to an unnamed marketplace upgrade or update unrelated
-components. The plugin owns its bundled `frontend-visual-qa`; never overwrite
-it directly with `daymade` upstream. Require verified active-package identity,
-a tested component-specific rollback including activation/configuration, and
-post-update validation. If these gates are unavailable, report `BLOCKED` and
-give a bounded native maintenance plan instead of running an unsafe updater.
+- handles exactly one specialist/action at a time;
+- refuses ambiguous provenance, duplicate ownership, source divergence, and unknown current-version evidence;
+- uses the provider's exact install/update channel;
+- never performs an unnamed/all-marketplace upgrade;
+- performs package-level postflight;
+- does not claim transactional rollback or current-session activation.
+
+Run it without `-Apply` first. Only after the user explicitly approves that exact specialist/action may it be run with `-Apply`.
+
+For Codex-plugin providers, verify the marketplace Git origin and catalog plugin source against the author's repository before update/install. A matching marketplace name alone is insufficient.
+
+For provider CLI/installers, use the current distribution channel declared in `specialists.json`; npm-based mutations explicitly request `@latest` where appropriate so local npx cache is not treated as current-version truth.
+
+The older `plan-frontend-dependencies.ps1`, `bootstrap-frontend-toolchain.ps1`, and `update-frontend-toolchain.ps1` remain compatibility/read-only maintenance helpers. They are not substitutes for task-scoped live specialist preflight.
+
+The plugin owns bundled `frontend-visual-qa` and `frontend-accessibility-qa`; never replace them directly from floating upstream copies.
+
 The retrospective skill is a reviewer, not a dependency installer.
 
 ## Classify the change first
@@ -280,19 +333,23 @@ Required:
 
 Do not use the frontend workflow unless the change directly alters rendered browser behavior.
 
-## Phase 1 — Understand and reproduce
+## Phase 1 — Understand, select capabilities, and reproduce
 
 Before editing:
 
 1. read project instructions;
-2. inspect the relevant implementation;
-3. identify affected routes/states;
-4. identify layout system and breakpoints;
-5. identify shared components;
-6. identify existing tests/browser tooling;
-7. reproduce the defect when practical.
+2. classify the frontend change and identify which external specialists are actually required/triggered;
+3. run task-scoped live preflight for those specialists;
+4. surface missing, stale, disabled, conflicting, unverified, or inactive-session specialists before their phase begins;
+5. if the user approves an install/update, mutate only that exact specialist, run postflight, and require a fresh session when indicated;
+6. inspect the relevant implementation;
+7. identify affected routes/states;
+8. identify layout system and breakpoints;
+9. identify shared components;
+10. identify existing tests/browser tooling;
+11. reproduce the defect when practical.
 
-Do not assume the visible symptom is the root cause.
+Do not assume the visible symptom is the root cause. Do not silently downgrade the specialist set because the user did not know a dependency was missing.
 
 ## Phase 2 — Establish design direction when warranted
 
@@ -475,6 +532,8 @@ Before reporting completion, state:
 - code checks run;
 - browser checks run;
 - console status;
+- external specialist preflight status for every selected provider;
+- any offered/approved install or update and whether a fresh-session activation check completed;
 - selected art-direction authority when design direction was in scope;
 - Taste/Impeccable role used, if any;
 - visual QA status;
@@ -490,4 +549,5 @@ Read:
 - `references/verification-matrix.md`
 - `references/dependencies.md`
 - `references/toolchain-maintenance.md`
+- `specialists.json`
 - bundled `../frontend-accessibility-qa/SKILL.md`
