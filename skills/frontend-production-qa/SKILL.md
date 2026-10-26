@@ -78,23 +78,22 @@ When an update is available, do not silently keep using the stale specialist. Of
 - for a required specialist, continue only with explicitly reduced/stale coverage and do not claim current-toolchain verification;
 - for a conditional recommended specialist, skip it or use a bounded fallback and report reduced specialist coverage.
 
-When installation/update is approved, plan the exact component first:
+When installation/update is appropriate, show the user the exact provider-specific action from `specialists.json` and obtain explicit approval for that exact specialist/action.
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
-```
+After approval, execute the provider's official channel directly rather than routing it through a custom package-manager wrapper:
 
-Only after explicit approval for that exact specialist/action may the orchestrator run the same command with `-Apply`.
+- Codex-plugin providers: use only the exact author-owned marketplace/plugin IDs from the registry; verify marketplace Git origin/catalog ownership before mutation; update only that named marketplace/plugin.
+- Provider CLI/installers: use only the exact current command recorded in the registry, including `@latest` where declared.
 
-After any mutation:
+Immediately after mutation:
 
-1. run package-level postflight;
+1. re-run package-level live preflight for that specialist;
 2. start a fresh Codex session when required;
-3. re-run live preflight;
-4. resolve the exact Skill ID in that fresh session;
+3. resolve the exact Skill ID in that fresh session;
+4. verify provider-specific runtime capability when relevant, such as Motion MCP or Impeccable hook trust;
 5. only then rely on the specialist.
 
-Never update all marketplaces/packages as a side effect of a frontend task.
+Never update all marketplaces/packages as a side effect of a frontend task. Never claim transactional rollback for a provider whose restore path has not been proven.
 
 ## Design references with bundled Inspo
 
@@ -251,20 +250,14 @@ A missing or stale specialist is a user-visible preflight finding, not a reason 
 
 `scripts/preflight-frontend-specialists.ps1` is the primary task-time check for required and triggered recommended specialists. It reads the current author source live and distinguishes package availability, freshness, duplicate IDs, marketplace provenance, and evidence gaps.
 
-`scripts/manage-frontend-specialist.ps1` is the only task-time mutation path documented by this skill. It:
+After live preflight, an install/update may be executed only when the user explicitly approves that exact specialist/action.
 
-- handles exactly one specialist/action at a time;
-- refuses ambiguous provenance, duplicate ownership, source divergence, and unknown current-version evidence;
-- uses the provider's exact install/update channel;
-- never performs an unnamed/all-marketplace upgrade;
-- performs package-level postflight;
-- does not claim transactional rollback or current-session activation.
+Do not add a custom package-manager layer. Read the official channel and exact identity from `specialists.json`, then invoke the provider directly:
 
-Run it without `-Apply` first. Only after the user explicitly approves that exact specialist/action may it be run with `-Apply`.
+- Codex-plugin providers: verify marketplace Git origin and catalog plugin source against the author's repository before update/install; a matching marketplace name alone is insufficient.
+- Provider CLI/installers: use the current distribution command declared in `specialists.json`; npm-based mutations explicitly request `@latest` where appropriate so local npx cache is not treated as current-version truth.
 
-For Codex-plugin providers, verify the marketplace Git origin and catalog plugin source against the author's repository before update/install. A matching marketplace name alone is insufficient.
-
-For provider CLI/installers, use the current distribution channel declared in `specialists.json`; npm-based mutations explicitly request `@latest` where appropriate so local npx cache is not treated as current-version truth.
+Every mutation is single-provider, followed by live postflight. Never perform an unnamed/all-marketplace upgrade and never claim current-session activation from package files alone.
 
 The older `plan-frontend-dependencies.ps1`, `bootstrap-frontend-toolchain.ps1`, and `update-frontend-toolchain.ps1` remain compatibility/read-only maintenance helpers. They are not substitutes for task-scoped live specialist preflight.
 
