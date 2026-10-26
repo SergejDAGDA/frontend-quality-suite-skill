@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0
+
+Conditional Motion specialist integration:
+
+- Add the official Motion AI Kit `motion` skill as a recommended external specialist for animation, layout motion, gestures, scroll-linked effects, springs, Motion API work and animation-performance diagnosis.
+- Keep Motion external and opt-in: it is neither required nor bundled, and the suite does not install or update it automatically.
+- Prefer CSS for simple effects when CSS is sufficient; never add the Motion runtime solely because the agent skill exists.
+- Require reduced-motion/accessibility handling and browser verification of relevant animated states, with normal regression closure for layout-affecting motion.
+- Extend dependency safety fixtures so Motion cannot silently drift into the required/bundled or managed-install path.
+
 ## 1.2.4
 
 Repository identity preparation for `SergejDAGDA/frontend-quality-suite-skill`:
