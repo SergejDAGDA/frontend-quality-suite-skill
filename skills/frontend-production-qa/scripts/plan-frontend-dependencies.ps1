@@ -23,7 +23,7 @@ $targets = @(
         Marketplace = "codex-frontend-production-qa"
         ExpectedRepository = "SergejDAGDA/frontend-quality-suite-skill"
         EntrySourceKind = "url"
-        RequiredSkillIds = @("frontend-visual-qa")
+        RequiredSkillIds = @("frontend-visual-qa", "frontend-accessibility-qa")
     }
 )
 
