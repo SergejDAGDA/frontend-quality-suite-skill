@@ -10,7 +10,10 @@
     {
       "key": "agent-skills",
       "class": "required",
-      "skill_ids": ["frontend-ui-engineering", "browser-testing-with-devtools"],
+      "skill_ids": [
+        "frontend-ui-engineering",
+        "browser-testing-with-devtools"
+      ],
       "repository": "addyosmani/agent-skills",
       "channel": "codex-plugin",
       "plugin_id": "agent-skills@agent-skills",
@@ -28,7 +31,9 @@
     {
       "key": "taste",
       "class": "recommended",
-      "skill_ids": ["design-taste-frontend"],
+      "skill_ids": [
+        "design-taste-frontend"
+      ],
       "repository": "Leonxlnx/taste-skill",
       "channel": "codex-plugin",
       "plugin_id": "taste-skill@taste-skill",
@@ -46,7 +51,9 @@
     {
       "key": "impeccable",
       "class": "recommended",
-      "skill_ids": ["impeccable"],
+      "skill_ids": [
+        "impeccable"
+      ],
       "repository": "pbakaus/impeccable",
       "channel": "provider-cli",
       "author_version": {
@@ -64,10 +71,22 @@
         "property": "metadata.version"
       },
       "install": {
-        "command": "npx impeccable install --providers=codex --scope=global"
+        "executable": "npx",
+        "args": [
+          "--yes",
+          "impeccable@latest",
+          "install",
+          "--providers=codex",
+          "--scope=global"
+        ]
       },
       "update": {
-        "command": "npx impeccable update"
+        "executable": "npx",
+        "args": [
+          "--yes",
+          "impeccable@latest",
+          "update"
+        ]
       },
       "fresh_session_required": true,
       "post_update_note": "Review /hooks in Codex after install/update because hook trust may change."
@@ -75,7 +94,9 @@
     {
       "key": "motion",
       "class": "recommended",
-      "skill_ids": ["motion"],
+      "skill_ids": [
+        "motion"
+      ],
       "repository": "motiondivision/ai-kit",
       "channel": "provider-installer",
       "author_version": {
@@ -96,10 +117,16 @@
         "kind": "payload-hash"
       },
       "install": {
-        "command": "npx motion-ai@latest"
+        "executable": "npx",
+        "args": [
+          "motion-ai@latest"
+        ]
       },
       "update": {
-        "command": "npx motion-ai@latest"
+        "executable": "npx",
+        "args": [
+          "motion-ai@latest"
+        ]
       },
       "fresh_session_required": true,
       "post_update_note": "The Motion installer is interactive; choose the intended scope and Codex target, then verify the Motion MCP in the fresh session."
