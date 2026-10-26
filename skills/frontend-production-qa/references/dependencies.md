@@ -67,15 +67,9 @@ Primary read-only check:
 The registry contains provider identity, repository, install channel and live
 author/distribution source metadata, but no pinned current external versions.
 
-When preflight reports an installable/updateable state, plan one component:
+When preflight reports an installable/updateable state, show the exact official provider action from `specialists.json`. Only after explicit approval may the orchestrator execute that one provider-native action directly.
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
-```
-
-Only after explicit approval may the same invocation be run with `-Apply`.
-Duplicate IDs, source divergence, unknown provenance and unverifiable live
-current-version evidence block automatic mutation.
+Duplicate IDs, source divergence, unknown provenance and unverifiable live current-version evidence block mutation. Do not add a second custom package-manager wrapper around the provider's own Codex plugin or CLI/installer channel.
 
 ## Guided installation boundary
 
