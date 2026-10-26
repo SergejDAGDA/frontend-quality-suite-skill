@@ -64,7 +64,7 @@ If the bundled Inspo MCP is unavailable, report that limitation when reference r
 
 ## Design-direction authority and Taste specialist
 
-Use **one art-direction authority per task**.
+Use one art-direction authority per task.
 
 Choose in this order:
 
