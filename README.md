@@ -94,15 +94,17 @@ For animation-heavy frontend work, the orchestrator can use the official externa
 
 Use it conditionally for substantial animation, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, Motion API work, or animation-performance diagnosis.
 
-It is **recommended, not required or bundled**. The suite does not install or update Motion automatically.
+It is **recommended, not required or bundled**. The suite checks Motion only when the task triggers it. Freshness is read from Motion's live author/distribution sources; no Motion version is pinned in this repository.
 
-Official setup is handled separately with:
+When Motion is missing or differs from the current author payload, the orchestrator offers the exact provider update/install before use. Mutation still requires explicit user approval.
+
+The current provider installer is invoked as:
 
 ```powershell
-npx motion-ai
+npx motion-ai@latest
 ```
 
-The installer can write skill files and hosted MCP configuration, so it must remain an explicit user-approved setup action.
+The installer can write skill files and hosted MCP configuration, so the action remains explicit and user-approved.
 
 Prefer CSS for simple hover/focus/press/fade/loading effects when CSS is sufficient. Do not add the Motion runtime package solely because the agent skill is available. Respect reduced-motion/accessibility requirements and verify relevant animated states in the browser.
 
@@ -122,7 +124,7 @@ Use **one art-direction authority per task**:
 
 When Taste establishes the direction, Impeccable may critique/polish within it but must not start a competing redesign. Taste's own inspector/look-fix loop does not replace the suite's viewport matrix, visual QA, accessibility QA, regression closure, or completion evidence.
 
-Taste is **recommended, not required or bundled**, and this suite does not install or update it automatically.
+Taste is **recommended, not required or bundled**. The suite checks it only when Taste routing is triggered. If it is missing or its author-owned plugin has a newer live version, the orchestrator offers the exact native Codex install/update and applies it only after explicit approval.
 
 ## Bundled accessibility specialist
 
@@ -138,10 +140,37 @@ Three audit depths prevent over-testing:
 
 The accessibility specialist is maintained in this repository. External WCAG/APCA agent skills are reference sources, not runtime dependencies.
 
+## Live specialist preflight
+
+External specialists are not assumed to exist merely because the orchestrator references them.
+
+After classifying a task, the suite derives the exact required/triggered specialist set and performs a **read-only live preflight before first use**:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+The registry in `skills/frontend-production-qa/specialists.json` stores only provider identity, repository, install channel and live version/payload sources. It intentionally stores **no current external version numbers**.
+
+Freshness is checked against the author's current source at runtime. For npm-distributed providers such as Impeccable and Motion, the author's manifest is also compared with the current official distribution metadata so an unpublished/de-synchronised source is not silently treated as installable.
+
+The preflight distinguishes states including `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` and evidence/source unknown states.
+
+If installation/update is appropriate, the orchestrator first shows a component-scoped plan:
+
+```powershell
+.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
+```
+
+Only after explicit approval may the same command be run with `-Apply`. It updates exactly one provider, verifies owner/provenance, performs postflight, and never runs a broad "upgrade everything" operation.
+
+A package found on disk is not proof that the current Codex session loaded the Skill. After mutations that require reload, start a fresh session and resolve the exact Skill ID before claiming that specialist phase ran.
+
 ## Core workflow
 
 ```text
 project rules
+  -> classify task + live specialist preflight
   -> understand/reproduce
   -> optional design references when warranted
   -> conditional Taste art direction when warranted
@@ -244,21 +273,24 @@ Project-specific architecture, legal constraints, design decisions and memory re
 
 The plugin itself is updated through the Git-backed marketplace.
 
-The maintenance scripts inside the skill are only for the external specialist toolchain.
+The bundled `frontend-visual-qa` and `frontend-accessibility-qa` skills are updated only with this plugin.
 
-The bundled `frontend-visual-qa` skill is updated through the frontend plugin itself. The maintenance scripts do not download or replace it from `daymade/claude-code-skills`.
+Primary task-time commands:
 
 ```powershell
-.\scripts\check-frontend-toolchain.ps1
-.\scripts\plan-frontend-dependencies.ps1
-.\scripts\bootstrap-frontend-toolchain.ps1
+.\scripts\preflight-frontend-specialists.ps1 -SkillId frontend-ui-engineering
+.\scripts\preflight-frontend-specialists.ps1 -SkillId design-taste-frontend
 .\scripts\check-frontend-updates.ps1
-.\scripts\update-frontend-toolchain.ps1 -Component agent-skills
+.\scripts\manage-frontend-specialist.ps1 -SkillId design-taste-frontend -Action update
 ```
 
-Normal frontend work must not silently install or update third-party dependencies.
+The first three are read-only. `manage-frontend-specialist.ps1` is plan-only unless `-Apply` is explicitly added after user approval.
 
-Guided installation planning is read-only and offers a documented `/plugins` handoff only when a missing package's marketplace Git origin and catalog source match the expected repository; the user must still review and approve in the native interface. The old bulk bootstrap no longer installs multiple dependencies. Targeted update planning is read-only. The old broad `-Apply` updater is blocked until native per-component rollback and active-plugin selection are independently verified. Review [toolchain maintenance](skills/frontend-production-qa/references/toolchain-maintenance.md) before any installation or update. Duplicate skill IDs must be resolved by package owner; a cached file alone does not prove active-session loading.
+The older `check-frontend-toolchain.ps1`, `plan-frontend-dependencies.ps1`, `bootstrap-frontend-toolchain.ps1`, and `update-frontend-toolchain.ps1` remain compatibility/read-only helpers. They do not replace live task-scoped preflight.
+
+Normal frontend work must never silently mutate third-party dependencies. It must, however, **proactively surface** missing/stale specialists that the selected workflow needs and offer the correct owner-specific install/update. Duplicate IDs, source divergence, unknown provenance, or unverifiable current versions stop automatic mutation.
+
+Review [toolchain maintenance](skills/frontend-production-qa/references/toolchain-maintenance.md) before installation/update. A cached file alone does not prove active-session loading.
 
 See:
 
