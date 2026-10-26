@@ -11,8 +11,14 @@ $readmePath = Join-Path $root "README.md"
 $readmeRuPath = Join-Path $root "README.ru.md"
 
 $plugin = Get-Content -LiteralPath $pluginPath -Raw | ConvertFrom-Json
-if ($plugin.version -ne "1.4.0") {
-    throw "plugin.json is not the expected 1.4.0 candidate"
+try {
+    $pluginVersion = [version]$plugin.version
+}
+catch {
+    throw "plugin.json version is not a parseable release version: $($plugin.version)"
+}
+if ($pluginVersion -lt [version]"1.4.0") {
+    throw "Accessibility architecture requires plugin version 1.4.0 or newer"
 }
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw
