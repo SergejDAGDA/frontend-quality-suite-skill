@@ -271,37 +271,42 @@ This remains read-only. It points to the current preflight/manager flow rather t
 
 This compatibility planner remains read-only and its old `-Apply` path stays blocked.
 
-Use `manage-frontend-specialist.ps1` for new explicitly approved task-time specialist mutations.
-
 ## Approved single-specialist mutation
 
-Plan first:
+Do not maintain a second custom package manager.
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
-```
+When live preflight reports `MISSING`, `MARKETPLACE_MISSING`, `UPDATE_AVAILABLE`, or `UPDATE_RECOMMENDED`, the orchestrator should show the user the exact official provider action from `specialists.json`.
 
-The plan performs live preflight and makes no changes.
+Only after explicit approval for that exact specialist/action may the orchestrator execute it directly.
 
-Only after the user explicitly approves that exact provider/action:
+For native Codex-plugin providers:
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update> -Apply
-```
+1. if the expected marketplace is missing, add only the exact author repository declared in the registry;
+2. verify the marketplace Git origin and catalog plugin source against the expected author repository;
+3. for an update, refresh only that named marketplace;
+4. materialize only the exact plugin ID;
+5. rerun live preflight.
+
+For provider CLI/installers:
+
+1. use only the exact executable/arguments from the registry;
+2. keep `@latest` where declared;
+3. never substitute an alternate installer or locally cached remembered version;
+4. rerun live preflight after completion.
 
 Safety properties:
 
-- exactly one provider/action per invocation;
+- exactly one provider/action per approved mutation;
 - no global or unnamed marketplace upgrade;
 - live author version/payload evidence required;
 - distribution/source divergence blocks mutation;
 - duplicate Skill IDs block mutation;
-- native plugin marketplace Git origin is checked against the author repository;
-- package-level postflight runs after mutation;
-- a fresh-session requirement is reported explicitly;
+- native plugin marketplace Git origin/catalog ownership is checked before mutation;
+- package-level postflight is required;
+- a fresh-session requirement is reported and enforced before claiming the Skill ran;
 - transactional rollback is **not** claimed.
 
-If the command fails after a provider has partially mutated state, treat recovery as a separate explicit task. Do not silently retry with a different source or package.
+If a provider command fails after partially mutating state, treat recovery as a separate explicit task. Do not silently retry with another source or broaden the update scope.
 
 ## Why mutation still requires consent
 
