@@ -52,110 +52,11 @@ $requiredBlock = [regex]::Match($manifest, '(?ms)^required:\s*(?<body>.*?)(?=^bu
 $bundledBlock = [regex]::Match($manifest, '(?ms)^bundled:\s*(?<body>.*?)(?=^recommended:)').Groups['body'].Value
 $recommendedBlock = [regex]::Match($manifest, '(?ms)^recommended:\s*(?<body>.*?)(?=^optional_unmanaged:)').Groups['body'].Value
 
-if ($requiredBlock -match '(?m)^\s*- name:\s*motion\s*$fixture = Join-Path ([IO.Path]::GetTempPath()) ("frontend-toolchain-fixture-" + [guid]::NewGuid().ToString("N"))
-$previousCodexHome = $env:CODEX_HOME
-try {
-    $env:CODEX_HOME = Join-Path $fixture "codex"
-    $direct = Join-Path $env:CODEX_HOME "skills\frontend-visual-qa\SKILL.md"
-    $plugin = Join-Path $env:CODEX_HOME "plugins\cache\codex-frontend-production-qa\frontend-production-qa\1.2.1\skills\frontend-visual-qa\SKILL.md"
-    New-Item -ItemType Directory -Force -Path (Split-Path $direct), (Split-Path $plugin) | Out-Null
-    $header = "---" + [Environment]::NewLine + "name: frontend-visual-qa" + [Environment]::NewLine + "---"
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "legacy")
-    Set-Content -LiteralPath $plugin -Value ($header + [Environment]::NewLine + "bundled")
-    $divergent = Invoke-Isolated -Script $readiness
-    # Readiness may also report unavailable CLI/browser in a CI runner; the
-    # isolated fixture asserts the duplicate diagnosis, not host readiness.
-    if ($divergent.Output -notmatch "\[AMBIGUOUS\] frontend-visual-qa") {
-        throw "Divergent same-ID copies were not reported"
-    }
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "bundled")
-    $identical = Invoke-Isolated -Script $readiness
-    if ($identical.Output -notmatch "\[DUPLICATE\] frontend-visual-qa") {
-        throw "Identical same-ID copies were not reported"
-    }
-}
-finally {
-    $env:CODEX_HOME = $previousCodexHome
-    if (Test-Path -LiteralPath $fixture) {
-        Remove-Item -LiteralPath $fixture -Recurse -Force
-    }
-}
-
-Write-Host "Scoped dependency safety fixtures PASS."
-exit 0
- -or
-    $bundledBlock -match '(?m)^\s*- name:\s*motion\s*$fixture = Join-Path ([IO.Path]::GetTempPath()) ("frontend-toolchain-fixture-" + [guid]::NewGuid().ToString("N"))
-$previousCodexHome = $env:CODEX_HOME
-try {
-    $env:CODEX_HOME = Join-Path $fixture "codex"
-    $direct = Join-Path $env:CODEX_HOME "skills\frontend-visual-qa\SKILL.md"
-    $plugin = Join-Path $env:CODEX_HOME "plugins\cache\codex-frontend-production-qa\frontend-production-qa\1.2.1\skills\frontend-visual-qa\SKILL.md"
-    New-Item -ItemType Directory -Force -Path (Split-Path $direct), (Split-Path $plugin) | Out-Null
-    $header = "---" + [Environment]::NewLine + "name: frontend-visual-qa" + [Environment]::NewLine + "---"
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "legacy")
-    Set-Content -LiteralPath $plugin -Value ($header + [Environment]::NewLine + "bundled")
-    $divergent = Invoke-Isolated -Script $readiness
-    # Readiness may also report unavailable CLI/browser in a CI runner; the
-    # isolated fixture asserts the duplicate diagnosis, not host readiness.
-    if ($divergent.Output -notmatch "\[AMBIGUOUS\] frontend-visual-qa") {
-        throw "Divergent same-ID copies were not reported"
-    }
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "bundled")
-    $identical = Invoke-Isolated -Script $readiness
-    if ($identical.Output -notmatch "\[DUPLICATE\] frontend-visual-qa") {
-        throw "Identical same-ID copies were not reported"
-    }
-}
-finally {
-    $env:CODEX_HOME = $previousCodexHome
-    if (Test-Path -LiteralPath $fixture) {
-        Remove-Item -LiteralPath $fixture -Recurse -Force
-    }
-}
-
-Write-Host "Scoped dependency safety fixtures PASS."
-exit 0
-) {
+if ($requiredBlock -match '(?m)^\s*- name:\s*motion\s*$' -or
+    $bundledBlock -match '(?m)^\s*- name:\s*motion\s*$') {
     throw "Motion drifted into required or bundled ownership"
 }
-if ($recommendedBlock -notmatch '(?ms)^\s*- name:\s*motion\s*\r?\n\s+provider:\s*motiondivision/ai-kit\s*$fixture = Join-Path ([IO.Path]::GetTempPath()) ("frontend-toolchain-fixture-" + [guid]::NewGuid().ToString("N"))
-$previousCodexHome = $env:CODEX_HOME
-try {
-    $env:CODEX_HOME = Join-Path $fixture "codex"
-    $direct = Join-Path $env:CODEX_HOME "skills\frontend-visual-qa\SKILL.md"
-    $plugin = Join-Path $env:CODEX_HOME "plugins\cache\codex-frontend-production-qa\frontend-production-qa\1.2.1\skills\frontend-visual-qa\SKILL.md"
-    New-Item -ItemType Directory -Force -Path (Split-Path $direct), (Split-Path $plugin) | Out-Null
-    $header = "---" + [Environment]::NewLine + "name: frontend-visual-qa" + [Environment]::NewLine + "---"
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "legacy")
-    Set-Content -LiteralPath $plugin -Value ($header + [Environment]::NewLine + "bundled")
-    $divergent = Invoke-Isolated -Script $readiness
-    # Readiness may also report unavailable CLI/browser in a CI runner; the
-    # isolated fixture asserts the duplicate diagnosis, not host readiness.
-    if ($divergent.Output -notmatch "\[AMBIGUOUS\] frontend-visual-qa") {
-        throw "Divergent same-ID copies were not reported"
-    }
-
-    Set-Content -LiteralPath $direct -Value ($header + [Environment]::NewLine + "bundled")
-    $identical = Invoke-Isolated -Script $readiness
-    if ($identical.Output -notmatch "\[DUPLICATE\] frontend-visual-qa") {
-        throw "Identical same-ID copies were not reported"
-    }
-}
-finally {
-    $env:CODEX_HOME = $previousCodexHome
-    if (Test-Path -LiteralPath $fixture) {
-        Remove-Item -LiteralPath $fixture -Recurse -Force
-    }
-}
-
-Write-Host "Scoped dependency safety fixtures PASS."
-exit 0
-) {
+if ($recommendedBlock -notmatch '(?ms)^\s*- name:\s*motion\s*\r?\n\s+provider:\s*motiondivision/ai-kit\s*$') {
     throw "Motion is not declared as the expected recommended external specialist"
 }
 
