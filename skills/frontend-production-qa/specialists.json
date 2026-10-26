@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "policy": {
     "task_scoped_preflight": true,
-    "live_author_source_required": true,
+    "live_current_channel_required": true,
     "pinned_external_versions_forbidden": true,
     "mutation_requires_explicit_user_approval": true
   },
@@ -18,8 +18,8 @@
       "channel": "codex-plugin",
       "plugin_id": "agent-skills@agent-skills",
       "marketplace": "agent-skills",
-      "author_version": {
-        "kind": "github-json",
+      "current_channel": {
+        "kind": "author-manifest",
         "url": "https://raw.githubusercontent.com/addyosmani/agent-skills/main/plugin.json",
         "property": "version"
       },
@@ -38,8 +38,8 @@
       "channel": "codex-plugin",
       "plugin_id": "taste-skill@taste-skill",
       "marketplace": "taste-skill",
-      "author_version": {
-        "kind": "github-json",
+      "current_channel": {
+        "kind": "author-manifest",
         "url": "https://raw.githubusercontent.com/Leonxlnx/taste-skill/main/.codex-plugin/plugin.json",
         "property": "version"
       },
@@ -56,13 +56,10 @@
       ],
       "repository": "pbakaus/impeccable",
       "channel": "provider-cli",
-      "author_version": {
-        "kind": "github-json",
-        "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/package.json",
-        "property": "version"
-      },
-      "distribution_version": {
-        "kind": "json",
+      "current_channel": {
+        "kind": "npm-dist-tag",
+        "package": "impeccable",
+        "tag": "latest",
         "url": "https://registry.npmjs.org/impeccable/latest",
         "property": "version"
       },
@@ -99,13 +96,10 @@
       ],
       "repository": "motiondivision/ai-kit",
       "channel": "provider-installer",
-      "author_version": {
-        "kind": "github-json",
-        "url": "https://raw.githubusercontent.com/motiondivision/ai-kit/main/packages/motion-ai/package.json",
-        "property": "version"
-      },
-      "distribution_version": {
-        "kind": "json",
+      "current_channel": {
+        "kind": "npm-dist-tag",
+        "package": "motion-ai",
+        "tag": "latest",
         "url": "https://registry.npmjs.org/motion-ai/latest",
         "property": "version"
       },
