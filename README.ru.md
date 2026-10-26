@@ -1,10 +1,14 @@
-# Frontend Production QA
+# Frontend Quality Suite
 
 [English version](README.md)
 
-Переиспользуемый Codex plugin для production frontend-разработки и QA.
+Переносимый Agent Skill-плагин для production frontend-разработки и QA. Он включает два отдельных навыка: `frontend-production-qa` для координации и `frontend-visual-qa` для визуального аудита.
 
 Он не заменяет специализированные навыки. Его задача — оркестрировать их, выбирать глубину проверки browser-facing изменений и определять, когда задача действительно подтверждена достаточными доказательствами.
+
+**GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Два Skill ID:** `$frontend-production-qa` и `$frontend-visual-qa` (без изменений). ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
+
+**Версия-кандидат:** `1.2.4` в данном PR. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
 
 ## Зачем он нужен
 
@@ -24,7 +28,7 @@ Frontend может успешно собираться и при этом ос�
 GitHub-репозиторий теперь является каноническим источником. При plugin-установке не нужно поддерживать отдельную ручную копию skill.
 
 ```powershell
-codex plugin marketplace add SergejDAGDA/codex-frontend-production-qa --ref main
+codex plugin marketplace add SergejDAGDA/frontend-quality-suite-skill --ref main
 codex plugin add frontend-production-qa@codex-frontend-production-qa
 ```
 

@@ -1,14 +1,14 @@
 {
   "name": "codex-frontend-production-qa",
   "interface": {
-    "displayName": "SergejDAGDA Frontend QA"
+    "displayName": "Frontend Quality Suite"
   },
   "plugins": [
     {
       "name": "frontend-production-qa",
       "source": {
         "source": "url",
-        "url": "https://github.com/SergejDAGDA/codex-frontend-production-qa.git",
+        "url": "https://github.com/SergejDAGDA/frontend-quality-suite-skill.git",
         "ref": "main"
       },
       "policy": {

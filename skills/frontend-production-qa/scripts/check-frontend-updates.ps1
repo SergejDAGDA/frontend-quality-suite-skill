@@ -59,7 +59,7 @@ function Get-PackageCache {
 
 $packages = @(
     @{ Marketplace = "agent-skills"; Package = "agent-skills"; Url = "https://github.com/addyosmani/agent-skills.git" },
-    @{ Marketplace = "codex-frontend-production-qa"; Package = "frontend-production-qa"; Url = "https://github.com/SergejDAGDA/codex-frontend-production-qa.git" }
+    @{ Marketplace = "codex-frontend-production-qa"; Package = "frontend-production-qa"; Url = "https://github.com/SergejDAGDA/frontend-quality-suite-skill.git" }
 )
 
 foreach ($spec in $packages) {

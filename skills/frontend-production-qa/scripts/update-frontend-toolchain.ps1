@@ -24,7 +24,7 @@ $plans = @{
         "Native materialization: codex plugin add agent-skills@agent-skills"
     )
     "frontend-production-qa" = @(
-        "Owner: SergejDAGDA/codex-frontend-production-qa",
+        "Owner: SergejDAGDA/frontend-quality-suite-skill",
         "Target: frontend-production-qa plugin including bundled frontend-visual-qa",
         "Native refresh: codex plugin marketplace upgrade codex-frontend-production-qa",
         "Native materialization: codex plugin add frontend-production-qa@codex-frontend-production-qa"

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.4
+
+Repository identity preparation for `SergejDAGDA/frontend-quality-suite-skill`:
+
+- Keep both bundled Skill IDs `frontend-production-qa` and `frontend-visual-qa` unchanged.
+- Preserve the installed native Codex plugin ID `frontend-production-qa@codex-frontend-production-qa` and marketplace catalog name for existing registrations.
+- Update the repository canonical source URLs in plugin/marketplace metadata, ownership checks and read-only guidance; do not relax owner-verification refusal for old origins.
+- Renaming, merge, published Release, Marketplace re-registration and local installation remain separate approved actions; the candidate itself performs none of them.
+
+
 ## 1.2.3 - 2026-10-17
 
 Guided installation planning for required frontend specialist plugins:

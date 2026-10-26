@@ -21,7 +21,7 @@ $targets = @(
         Component = "frontend-production-qa"
         PluginId = "frontend-production-qa@codex-frontend-production-qa"
         Marketplace = "codex-frontend-production-qa"
-        ExpectedRepository = "SergejDAGDA/codex-frontend-production-qa"
+        ExpectedRepository = "SergejDAGDA/frontend-quality-suite-skill"
         EntrySourceKind = "url"
         RequiredSkillIds = @("frontend-visual-qa")
     }

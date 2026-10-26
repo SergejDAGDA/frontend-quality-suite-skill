@@ -75,7 +75,7 @@ exit /b 9
     $addyRoot = Join-Path $fixture "verified-addy"
     Make-Market -Folder $addyRoot -Origin "https://github.com/addyosmani/agent-skills.git" -Name "agent-skills" -Plugin "agent-skills" -Source @{ source = "local"; path = "./" }
     $frontRoot = Join-Path $fixture "verified-frontend"
-    Make-Market -Folder $frontRoot -Origin "https://github.com/SergejDAGDA/codex-frontend-production-qa.git" -Name "codex-frontend-production-qa" -Plugin "frontend-production-qa" -Source @{ source = "url"; url = "https://github.com/SergejDAGDA/codex-frontend-production-qa.git"; ref = "main" }
+    Make-Market -Folder $frontRoot -Origin "https://github.com/SergejDAGDA/frontend-quality-suite-skill.git" -Name "codex-frontend-production-qa" -Plugin "frontend-production-qa" -Source @{ source = "url"; url = "https://github.com/SergejDAGDA/frontend-quality-suite-skill.git"; ref = "main" }
     $markets = @(
         @{ name = "agent-skills"; root = $addyRoot },
         @{ name = "codex-frontend-production-qa"; root = $frontRoot }
@@ -93,6 +93,15 @@ exit /b 9
             throw "Verified $component did not produce strictly native handoff: $($result.Output)"
         }
     }
+
+    # Migration guard: old Git origin must not be silently trusted as the new canonical owner.
+    & git -C $frontRoot remote set-url origin "https://github.com/SergejDAGDA/codex-frontend-production-qa.git"
+    $legacyOrigin = Invoke-Child -Script $planner -Arguments @("-Component", "frontend-production-qa", "-Json")
+    $row = $legacyOrigin.Output | ConvertFrom-Json
+    if ($legacyOrigin.Code -ne 0 -or $row.Status -ne "CONFLICT" -or $row.NativeInstallAction) {
+        throw "Historical Git origin bypassed the canonical repository owner check: $($legacyOrigin.Output)"
+    }
+    & git -C $frontRoot remote set-url origin "https://github.com/SergejDAGDA/frontend-quality-suite-skill.git"
 
     # Reproduces the exact review BLOCKER: same marketplace name, wrong owner root.
     $wrongRoot = Join-Path $fixture "wrong-owner"
@@ -116,7 +125,7 @@ exit /b 9
         throw "Wrong catalog plugin owner produced an install recommendation: $($badSource.Output)"
     }
     Set-Content -LiteralPath $badCatalog -Encoding utf8 -Value @'
-{"name":"codex-frontend-production-qa","plugins":[{"name":"frontend-production-qa","source":{"source":"url","url":"https://github.com/SergejDAGDA/codex-frontend-production-qa.git","ref":"main"}}]}
+{"name":"codex-frontend-production-qa","plugins":[{"name":"frontend-production-qa","source":{"source":"url","url":"https://github.com/SergejDAGDA/frontend-quality-suite-skill.git","ref":"main"}}]}
 '@
 
     Set-Markets -Items $markets

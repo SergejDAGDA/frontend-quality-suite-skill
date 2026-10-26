@@ -1,14 +1,14 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "frontend-production-qa",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Production frontend orchestration with responsive verification, real-browser QA, regression closure, and optional design-reference search.",
   "author": {
     "name": "Sergej DAGDA",
     "url": "https://github.com/SergejDAGDA"
   },
-  "homepage": "https://github.com/SergejDAGDA/codex-frontend-production-qa",
-  "repository": "https://github.com/SergejDAGDA/codex-frontend-production-qa",
+  "homepage": "https://github.com/SergejDAGDA/frontend-quality-suite-skill",
+  "repository": "https://github.com/SergejDAGDA/frontend-quality-suite-skill",
   "license": "MIT",
   "keywords": [
     "frontend",
@@ -30,7 +30,7 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/SergejDAGDA/codex-frontend-production-qa",
+    "websiteURL": "https://github.com/SergejDAGDA/frontend-quality-suite-skill",
     "defaultPrompt": [
       "Fix this frontend issue and verify it across affected viewports.",
       "Build this UI and close responsive and visual regressions.",
