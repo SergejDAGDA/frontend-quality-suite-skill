@@ -156,15 +156,11 @@ Freshness is checked against the author's current source at runtime. For npm-dis
 
 The preflight distinguishes states including `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` and evidence/source unknown states.
 
-If installation/update is appropriate, the orchestrator first shows a component-scoped plan:
+If installation/update is appropriate, the orchestrator shows the exact provider-native action from `specialists.json` before changing anything. Only after explicit approval may it execute that one action.
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
-```
+Codex-plugin providers use the exact author-owned marketplace/plugin identity after ownership verification. Provider CLI/installers use the exact current command in the registry, including `@latest` where declared. There is no custom package-manager wrapper and no broad "upgrade everything" operation.
 
-Only after explicit approval may the same command be run with `-Apply`. It updates exactly one provider, verifies owner/provenance, performs postflight, and never runs a broad "upgrade everything" operation.
-
-A package found on disk is not proof that the current Codex session loaded the Skill. After mutations that require reload, start a fresh session and resolve the exact Skill ID before claiming that specialist phase ran.
+After mutation, rerun live preflight, start a fresh Codex session when required, and resolve the exact Skill ID before claiming that specialist phase ran. A package found on disk is not active-session proof.
 
 ## Core workflow
 
@@ -281,10 +277,9 @@ Primary task-time commands:
 .\scripts\preflight-frontend-specialists.ps1 -SkillId frontend-ui-engineering
 .\scripts\preflight-frontend-specialists.ps1 -SkillId design-taste-frontend
 .\scripts\check-frontend-updates.ps1
-.\scripts\manage-frontend-specialist.ps1 -SkillId design-taste-frontend -Action update
 ```
 
-The first three are read-only. `manage-frontend-specialist.ps1` is plan-only unless `-Apply` is explicitly added after user approval.
+These commands are read-only. When preflight finds a missing/stale selected specialist, the orchestrator shows the exact provider-native install/update from `specialists.json`; it executes that command only after explicit approval.
 
 The older `check-frontend-toolchain.ps1`, `plan-frontend-dependencies.ps1`, `bootstrap-frontend-toolchain.ps1`, and `update-frontend-toolchain.ps1` remain compatibility/read-only helpers. They do not replace live task-scoped preflight.
 
