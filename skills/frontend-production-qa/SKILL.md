@@ -62,6 +62,52 @@ For ordinary bug fixes, responsive regressions, faithful existing-design work, a
 
 If the bundled Inspo MCP is unavailable, report that limitation when reference research was actually needed. Its absence does not block ordinary frontend regression work.
 
+## Design-direction authority and Taste specialist
+
+Use **one art-direction authority per task**.
+
+Choose in this order:
+
+1. an existing approved project brand/design system when the task must preserve it;
+2. the external `design-taste-frontend` specialist when a new or replacement visual direction is explicitly warranted;
+3. Impeccable new-work/design-direction capability only when Taste was not selected and a design direction is still needed.
+
+Do not let Taste and Impeccable independently establish competing visual directions for the same task.
+
+Use `design-taste-frontend` when it is installed and the task materially asks for:
+
+- a new landing page, marketing/public-facing page, portfolio, campaign, product page, or visual showcase that needs a distinctive art direction;
+- a deliberate redesign or restyle that is allowed to replace the existing visual world;
+- a page/interface described as generic, templated, "AI-made", bland, or in need of a distinctive/premium/award-level direction;
+- a new app/dashboard screen where the user explicitly wants a fresh art direction rather than preservation of an established product design.
+
+Skip Taste for:
+
+- ordinary bug fixes;
+- responsive regressions;
+- exact screenshot/reference matching;
+- faithful maintenance of an approved existing design system;
+- accessibility remediation;
+- small color/spacing/layout corrections;
+- nonvisual browser behavior;
+- release QA where no redesign is requested.
+
+When Taste is selected:
+
+- run it before implementation as the art-direction layer, after project constraints and optional reference research are understood;
+- preserve project/brand constraints and use Taste's own preservation controls when appropriate;
+- treat Taste's browser inspector and look/fix loop as implementation-stage design refinement, **not** as the suite's final completion authority;
+- after the Taste direction is chosen, Impeccable may critique or polish the implementation inside that direction, but must not replace the direction unless the user explicitly asks to reopen art direction;
+- do not alternate Taste -> Impeccable -> Taste in a remediation loop;
+- a downstream Impeccable-only design suggestion gets at most one refinement cycle unless it exposes new evidence of a functional, accessibility, responsive, or explicit project-requirement failure;
+- the bundled `frontend-visual-qa` remains the rendered visual-evidence layer;
+- the bundled `frontend-accessibility-qa` and explicit project/legal requirements override Taste house rules whenever they conflict;
+- the orchestrator's viewport matrix, regression closure, browser checks, and completion evidence remain authoritative.
+
+Taste is a recommended external specialist. Its plugin/repository name is `taste-skill`, but its current Skill ID is `design-taste-frontend`. Do not route by the repository/plugin name as though it were the Skill ID.
+
+If Taste is unavailable, continue with project design authority and/or Impeccable when appropriate; report reduced art-direction coverage only when the task actually depended on it.
+
 ## Motion and interaction specialist
 
 When the external `motion` skill is installed, use it conditionally for work that materially creates or changes:
@@ -114,13 +160,14 @@ Do not run a full audit after every trivial frontend edit. Promote scope when sh
 
 ## Recommended and optional layers
 
-Use Impeccable for meaningful design/layout/typography/hierarchy/responsive critique or polish when it is installed and relevant.
+Use Impeccable for meaningful design/layout/typography/hierarchy/responsive critique or polish when it is installed and relevant. If Taste established the art direction, constrain Impeccable to critique/polish inside that direction rather than starting a competing redesign.
 
 Use the external `motion` specialist only for the conditional motion/interaction cases above. It is recommended, not required or bundled.
 
+Use the external `design-taste-frontend` specialist only for the conditional art-direction cases above. It is recommended, not required or bundled.
+
 Optional locally available integrations may include:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`
@@ -249,13 +296,21 @@ Do not assume the visible symptom is the root cause.
 
 ## Phase 2 — Establish design direction when warranted
 
-For new UI, redesign, or substantial visual exploration, use the bundled Inspo reference layer before implementation.
+For new UI, redesign, or substantial visual exploration, use the bundled Inspo reference layer when reference research is useful.
+
+Then select exactly one art-direction authority.
+
+- Preserve the existing approved project design when preservation is required.
+- Use `design-taste-frontend` when the task qualifies for a new/replacement distinctive direction.
+- Otherwise use Impeccable for design direction only when appropriate and Taste was not selected.
 
 Extract transferable patterns such as hierarchy, composition, spacing logic, navigation structure, component archetypes, and responsive strategy.
 
 Do not copy branding, proprietary content, or another site's visual identity.
 
 If the task is an existing-design bug fix or regression, preserve the existing project instead of inventing a new direction.
+
+Once the art direction is selected, lock it for the task unless the user explicitly reopens that decision or new hard evidence makes the direction infeasible.
 
 ## Phase 3 — Accessibility design guard when relevant
 
@@ -420,6 +475,8 @@ Before reporting completion, state:
 - code checks run;
 - browser checks run;
 - console status;
+- selected art-direction authority when design direction was in scope;
+- Taste/Impeccable role used, if any;
 - visual QA status;
 - accessibility mode used and WCAG status;
 - APCA advisory status if APCA was used;
