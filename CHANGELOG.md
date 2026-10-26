@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.0
+
+Conditional Taste art-direction routing:
+
+- Replace the obsolete `taste-skill` optional placeholder with the current `design-taste-frontend` Skill ID from `Leonxlnx/taste-skill`.
+- Classify Taste as a recommended external specialist for genuinely new/replacement art direction rather than a generic QA dependency.
+- Add explicit triggers and non-triggers so ordinary bug fixes, reference matching, accessibility remediation and release QA do not invoke a redesign workflow.
+- Enforce one art-direction authority per task: existing approved project design, Taste, or Impeccable design-direction capability.
+- When Taste establishes direction, constrain Impeccable to downstream critique/polish inside that direction; do not alternate the two tools as competing remediation loops.
+- Keep bundled visual QA, accessibility QA, responsive verification and regression closure authoritative over Taste's internal inspector/look-fix loop.
+- Document the native Codex Taste plugin install path while keeping installation/update explicitly user-approved and unmanaged by normal frontend work.
+- Remove hard-coded current-version wording from bilingual READMEs so `plugin.json` remains the only version source.
+- Add design-routing safety fixtures for dependency ownership, authority arbitration, anti-loop rules and bilingual documentation.
+
 ## 1.4.1
 
 Documentation consistency after the 1.4.0 accessibility merge:
