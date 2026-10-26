@@ -17,7 +17,7 @@ Conditional Taste art-direction routing:
 - Add `specialists.json` as a versionless operational registry: provider identity, owner, install channel and live author/distribution sources only.
 - Resolve external freshness live from author sources; do not store remembered current versions in the orchestrator.
 - Detect missing, disabled, stale/different, duplicate, source-divergent and provenance-unknown specialist states before use.
-- Add a component-scoped install/update executor that is plan-only by default and mutates exactly one provider only after explicit approval.
+- After explicit approval, use the exact provider-native install/update channel from the versionless registry; avoid a second custom package-manager wrapper.
 - Verify Codex-plugin marketplace Git origin/catalog ownership before mutation; npm-based provider mutations explicitly request `@latest`.
 - Require package postflight and fresh-session Skill-ID resolution after mutations; cache presence remains insufficient activation evidence.
 - Replace the partial legacy update checker with the unified live preflight while retaining older maintenance scripts as read-only compatibility helpers.
