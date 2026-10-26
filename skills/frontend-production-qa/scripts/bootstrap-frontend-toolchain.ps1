@@ -20,5 +20,6 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 Write-Host "Required Chrome DevTools MCP: verify in the active Desktop environment."
 Write-Host "If missing, obtain separate explicit approval for native MCP registration."
-Write-Host "Recommended Impeccable: optional, NOT installed by this bootstrap."
+Write-Host "For task-time specialist freshness, run preflight-frontend-specialists.ps1."
+Write-Host "For an explicitly approved single specialist mutation, use manage-frontend-specialist.ps1."
 Write-Host "No changes made. Reload Codex Desktop only after separately approved installation."
