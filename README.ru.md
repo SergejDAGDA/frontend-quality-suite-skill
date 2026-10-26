@@ -158,15 +158,11 @@ Registry `skills/frontend-production-qa/specialists.json` хранит толь�
 
 Preflight различает, в частности, `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` и состояния с недостаточной remote/local evidence.
 
-Если установка/обновление допустимы, оркестратор сначала показывает план для одного конкретного specialist:
+Если установка/обновление допустимы, оркестратор сначала показывает точное provider-native действие из `specialists.json` и ничего не меняет без явного разрешения.
 
-```powershell
-.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
-```
+Для Codex-plugin используется только exact author-owned marketplace/plugin identity после проверки ownership. Для provider CLI/installers используется текущая точная команда из registry, включая `@latest`, где это предусмотрено. Отдельного самописного package-manager wrapper нет, как и общего «update everything».
 
-Только после явного разрешения тот же вызов выполняется с `-Apply`. Executor изменяет ровно одного provider-а, проверяет owner/provenance, делает postflight и никогда не выполняет общий «update everything».
-
-Наличие package/skill на диске не доказывает загрузку в текущую сессию Codex. После mutation, требующей reload, нужно открыть свежую сессию и разрешить exact Skill ID прежде, чем считать соответствующий этап реально выполненным.
+После mutation повторяется live preflight, при необходимости открывается свежая Codex session и разрешается exact Skill ID. Наличие package/skill на диске само по себе не доказывает активную загрузку.
 
 ## Основной workflow
 
