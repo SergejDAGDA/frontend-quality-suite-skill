@@ -8,7 +8,7 @@ It does not replace specialist skills. It orchestrates them, defines how deeply 
 
 **GitHub repository:** `SergejDAGDA/frontend-quality-suite-skill`. **Installed plugin ID:** `frontend-production-qa@codex-frontend-production-qa` (unchanged). **Bundled Skill IDs:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. The Marketplace ID intentionally retains its historical name to avoid an unapproved change to an existing native Codex registration.
 
-**Current plugin version:** `1.4.1` on `main`. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
+**Version source:** the current plugin version is declared only in `plugin.json`. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
 
 ## Why this exists
 
@@ -106,6 +106,24 @@ The installer can write skill files and hosted MCP configuration, so it must rem
 
 Prefer CSS for simple hover/focus/press/fade/loading effects when CSS is sufficient. Do not add the Motion runtime package solely because the agent skill is available. Respect reduced-motion/accessibility requirements and verify relevant animated states in the browser.
 
+## Conditional Taste art-direction specialist
+
+For frontend work that genuinely needs a new or replacement visual direction, the orchestrator can use the external `design-taste-frontend` skill from [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill).
+
+Use it conditionally for distinctive new landing/marketing/public pages, portfolios/showcases, deliberate redesign/restyle work, explicitly anti-generic/"AI-made" redesigns, or a new app/dashboard visual world when the user asks for one.
+
+Skip Taste for ordinary bug fixes, responsive regressions, exact reference matching, faithful maintenance of an approved design system, accessibility remediation, small visual corrections, and release QA without redesign.
+
+Use **one art-direction authority per task**:
+
+- an existing approved project design when preservation is required;
+- Taste when a new/replacement direction is explicitly warranted;
+- Impeccable design-direction capability only when Taste was not selected and direction is still needed.
+
+When Taste establishes the direction, Impeccable may critique/polish within it but must not start a competing redesign. Taste's own inspector/look-fix loop does not replace the suite's viewport matrix, visual QA, accessibility QA, regression closure, or completion evidence.
+
+Taste is **recommended, not required or bundled**, and this suite does not install or update it automatically.
+
 ## Bundled accessibility specialist
 
 The suite bundles `frontend-accessibility-qa` as the accessibility authority for browser-facing work.
@@ -126,6 +144,7 @@ The accessibility specialist is maintained in this repository. External WCAG/APC
 project rules
   -> understand/reproduce
   -> optional design references when warranted
+  -> conditional Taste art direction when warranted
   -> accessibility design guard when relevant
   -> frontend implementation
   -> conditional Motion specialist when relevant
@@ -192,7 +211,8 @@ Chrome DevTools MCP comes from [ChromeDevTools/chrome-devtools-mcp](https://gith
 
 Recommended conditional specialists:
 
-- [Impeccable](https://github.com/pbakaus/impeccable) for design-quality critique and polish;
+- [Taste Skill](https://github.com/Leonxlnx/taste-skill) / `design-taste-frontend` for new or replacement art direction;
+- [Impeccable](https://github.com/pbakaus/impeccable) for design-quality critique and polish inside the selected direction;
 - [Motion AI Kit](https://github.com/motiondivision/ai-kit) for substantial animation and interaction work.
 
 Related optional skills:
@@ -202,7 +222,6 @@ Related optional skills:
 
 Optional existing integrations:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`
