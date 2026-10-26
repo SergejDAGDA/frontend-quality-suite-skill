@@ -8,7 +8,7 @@ It does not replace specialist skills. It orchestrates them, defines how deeply 
 
 **GitHub repository:** `SergejDAGDA/frontend-quality-suite-skill`. **Installed plugin ID:** `frontend-production-qa@codex-frontend-production-qa` (unchanged). **Bundled Skill IDs:** `$frontend-production-qa`, `$frontend-visual-qa` (unchanged). The Marketplace ID intentionally retains its historical name to avoid an unapproved change to an existing native Codex registration.
 
-**Version candidate:** `1.2.4` in this PR. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
+**Version candidate:** `1.3.0` in the Motion integration PR stacked on the repository-identity migration. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
 
 ## Why this exists
 
@@ -88,6 +88,24 @@ It is not the design authority for an existing project. For bug fixes, screensho
 
 No separate `codex mcp add inspo ...` is needed when the plugin is installed.
 
+## Conditional Motion specialist
+
+For animation-heavy frontend work, the orchestrator can use the official external `motion` skill from [Motion AI Kit](https://github.com/motiondivision/ai-kit).
+
+Use it conditionally for substantial animation, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, Motion API work, or animation-performance diagnosis.
+
+It is **recommended, not required or bundled**. The suite does not install or update Motion automatically.
+
+Official setup is handled separately with:
+
+```powershell
+npx motion-ai
+```
+
+The installer can write skill files and hosted MCP configuration, so it must remain an explicit user-approved setup action.
+
+Prefer CSS for simple hover/focus/press/fade/loading effects when CSS is sufficient. Do not add the Motion runtime package solely because the agent skill is available. Respect reduced-motion/accessibility requirements and verify relevant animated states in the browser.
+
 ## Core workflow
 
 ```text
@@ -95,6 +113,7 @@ project rules
   -> understand/reproduce
   -> optional design references when warranted
   -> frontend implementation
+  -> conditional Motion specialist when relevant
   -> design-quality layer when relevant
   -> code checks
   -> real browser
@@ -152,9 +171,10 @@ The first two come from [addyosmani/agent-skills](https://github.com/addyosmani/
 
 Chrome DevTools MCP comes from [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp).
 
-Recommended design-quality layer:
+Recommended conditional specialists:
 
-- [Impeccable](https://github.com/pbakaus/impeccable)
+- [Impeccable](https://github.com/pbakaus/impeccable) for design-quality critique and polish;
+- [Motion AI Kit](https://github.com/motiondivision/ai-kit) for substantial animation and interaction work.
 
 Related optional skills:
 
