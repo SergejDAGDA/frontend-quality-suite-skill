@@ -40,9 +40,37 @@ plugin registration and current Desktop session load. No single one of those
 proves all the others. Host MCP configuration, active MCP startup and browser
 connectivity likewise require separate evidence.
 
-Use one explicit approval for the known missing REQUIRED set. RECOMMENDED
-and OPTIONAL components are opt-in. Do not automatically update or replace
-an independently maintained bundle when its upstream repository changes.
+The task-time orchestrator must proactively detect missing or stale REQUIRED
+and task-triggered RECOMMENDED specialists. The user does not need to know
+which dependency to ask about. Detection is read-only; any mutation still
+requires explicit approval for the exact provider/action.
+
+Do not store a remembered "current version" for external specialists here.
+Use `specialists.json` plus `preflight-frontend-specialists.ps1` to resolve
+the configured moving current provider channel live. For npm-distributed
+providers, the configured dist-tag (normally `latest`) is the authoritative
+current installable release; repository `main` is not required to match it.
+
+## Task-time live specialist preflight
+
+Primary runtime source registry:
+
+```text
+skills/frontend-production-qa/specialists.json
+```
+
+Primary read-only check:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+The registry contains provider identity, repository, install channel and a
+moving current provider channel, but no pinned current external versions.
+
+When preflight reports an installable/updateable state, show the exact official provider action from `specialists.json`. Only after explicit approval may the orchestrator execute that one provider-native action directly.
+
+Duplicate IDs, unknown provenance and unverifiable live current-channel evidence block mutation. Do not add a second custom package-manager wrapper around the provider's own Codex plugin or CLI/installer channel.
 
 ## Guided installation boundary
 
@@ -165,10 +193,10 @@ Documentation:
 
 https://motion.dev/docs/ai-kit
 
-Official installer:
+Official current installer used after explicit approval:
 
 ```powershell
-npx motion-ai
+npx motion-ai@latest
 ```
 
 Official upgrade path:
@@ -183,20 +211,69 @@ Use the specialist for substantial animation, transition orchestration, layout m
 
 Do not install the Motion runtime package solely because the agent skill is present. Project dependency policy remains authoritative.
 
+### Taste Skill
+
+The upstream repository/plugin is:
+
+https://github.com/Leonxlnx/taste-skill
+
+The current Skill ID is:
+
+```text
+design-taste-frontend
+```
+
+The repository/plugin name `taste-skill` is not the Skill ID.
+
+Native Codex plugin installation:
+
+```powershell
+codex plugin marketplace add Leonxlnx/taste-skill
+codex plugin add taste-skill@taste-skill
+```
+
+Targeted update:
+
+```powershell
+codex plugin marketplace upgrade taste-skill
+codex plugin add taste-skill@taste-skill
+```
+
+Before either path, task-time preflight resolves the live author-owned plugin
+channel and verifies marketplace owner/provenance. Start a fresh Codex session after
+installation/update and resolve the exact `design-taste-frontend` Skill ID.
+
+Upstream also documents direct skill installation through the agent-skills CLI, but this suite prefers the native Codex plugin route when operating in Codex.
+
+Treat Taste as a **conditional external recommendation**, not as required or bundled content.
+
+Use it when a task genuinely needs new/replacement art direction: distinctive landing/marketing/public pages, portfolios/showcases, deliberate redesign/restyle, explicitly anti-generic work, or a new app/dashboard visual world when the user requests one.
+
+Skip it for ordinary bug fixes, responsive regressions, exact reference matching, faithful maintenance of an established design system, accessibility remediation, small visual corrections, or release QA without redesign.
+
+Taste owns art direction only when selected. Its browser inspector and internal look/fix rounds do not replace the suite's viewport matrix, bundled visual QA, bundled accessibility QA, regression closure, or completion evidence.
+
+If Taste selects the direction, Impeccable may critique/polish inside that direction but must not start a competing redesign unless the user explicitly reopens art direction. Do not alternate Taste and Impeccable as competing remediation loops.
+
+Taste currently requires Node 22+ and Chrome, Edge, or Chromium for its own scripts. Do not silently install or update it from this suite's bootstrap/update scripts.
+
 ### Impeccable
 
-Install globally for Codex:
+Install globally for Codex after explicit approval:
 
 ```powershell
-npx impeccable install --providers=codex --scope=global
+npx --yes impeccable@latest install --providers=codex --scope=global
 ```
 
-Check/update:
+Targeted update:
 
 ```powershell
-npx impeccable check
-npx impeccable update
+npx --yes impeccable@latest update
 ```
+
+Preflight compares the installed Skill frontmatter version directly with npm
+`latest` before offering either mutation. The repository package manifest is
+not required to match the published npm channel.
 
 After install/update, Codex users may need to review/approve the project hook with `/hooks`.
 
@@ -206,7 +283,6 @@ Do not automatically initialize Impeccable in mature projects with an establishe
 
 The orchestrator may use already installed:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`

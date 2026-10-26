@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.5.0
+
+Conditional Taste art-direction routing:
+
+- Replace the obsolete `taste-skill` optional placeholder with the current `design-taste-frontend` Skill ID from `Leonxlnx/taste-skill`.
+- Classify Taste as a recommended external specialist for genuinely new/replacement art direction rather than a generic QA dependency.
+- Add explicit triggers and non-triggers so ordinary bug fixes, reference matching, accessibility remediation and release QA do not invoke a redesign workflow.
+- Enforce one art-direction authority per task: existing approved project design, Taste, or Impeccable design-direction capability.
+- When Taste establishes direction, constrain Impeccable to downstream critique/polish inside that direction; do not alternate the two tools as competing remediation loops.
+- Keep bundled visual QA, accessibility QA, responsive verification and regression closure authoritative over Taste's internal inspector/look-fix loop.
+- Document the native Codex Taste plugin install path while keeping installation/update explicitly user-approved and unmanaged by normal frontend work.
+- Remove hard-coded current-version wording from bilingual READMEs so `plugin.json` remains the only version source.
+- Add design-routing safety fixtures for dependency ownership, authority arbitration, anti-loop rules and bilingual documentation.
+- Add mandatory task-scoped specialist preflight before first external-skill use; required/triggered specialists can no longer disappear silently.
+- Add `specialists.json` as a versionless operational registry: provider identity, owner, install channel and moving current provider channels only.
+- Resolve external freshness from moving provider channels; for npm tools, use the configured dist-tag `latest` as current installable-version authority rather than repository `main`.
+- Detect missing, disabled, stale/different, duplicate and provenance-unknown specialist states before use.
+- After explicit approval, use the exact provider-native install/update channel from the versionless registry; avoid a second custom package-manager wrapper.
+- Verify Codex-plugin marketplace Git origin/catalog ownership before mutation; npm-based currentness and provider mutations explicitly use the configured `latest` dist-tag/channel.
+- Require package postflight and fresh-session Skill-ID resolution after mutations; cache presence remains insufficient activation evidence.
+- Replace the partial legacy update checker with the unified live preflight while retaining older maintenance scripts as read-only compatibility helpers.
+- Preserve the prior rollback finding: targeted approved mutations are allowed, but no transactional rollback capability is claimed.
+
 ## 1.4.1
 
 Documentation consistency after the 1.4.0 accessibility merge:

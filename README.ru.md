@@ -10,7 +10,7 @@
 
 **GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Bundled Skill ID:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
 
-**Текущая версия plugin:** `1.4.1` в `main`. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
+**Источник версии:** текущая версия plugin объявляется только в `plugin.json`. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
 
 ## Зачем он нужен
 
@@ -96,17 +96,37 @@ Inspo не становится источником дизайна сущест
 
 Он подключается условно для сложной анимации, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, работы с Motion API и диагностики animation performance.
 
-Это **recommended**, но не required и не bundled dependency. Suite не устанавливает и не обновляет Motion автоматически.
+Это **recommended**, но не required и не bundled dependency. Suite проверяет Motion только тогда, когда задача действительно его триггерит. Текущая устанавливаемая версия Motion определяется по npm dist-tag `latest`; версия Motion не закрепляется в нашем repository.
 
-Официальная установка выполняется отдельно:
+Если Motion отсутствует или его payload отличается от текущего payload автора, оркестратор до применения предлагает точную provider-specific установку/обновление. Изменение окружения всё равно требует явного разрешения пользователя.
+
+Текущий provider installer вызывается так:
 
 ```powershell
-npx motion-ai
+npx motion-ai@latest
 ```
 
-Installer может изменять skill files и hosted MCP configuration, поэтому запускать его можно только как отдельное явно разрешённое действие.
+Installer может изменять skill files и hosted MCP configuration, поэтому действие остаётся явным и разрешённым пользователем.
 
 Для простых hover/focus/press/fade/loading эффектов нужно предпочитать CSS, если его достаточно. Нельзя добавлять Motion runtime только из-за наличия agent skill. Нужно соблюдать reduced-motion/accessibility требования и проверять существенные animated states в реальном браузере.
+
+## Условный Taste art-direction specialist
+
+Когда frontend-задаче действительно нужна новая или заменяющая визуальная концепция, оркестратор может использовать внешний skill `design-taste-frontend` из [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill).
+
+Он нужен для выразительных новых landing/marketing/public страниц, portfolio/showcase, осознанного redesign/restyle, явного запроса убрать generic/"AI-made" вид или создать новую визуальную систему app/dashboard по запросу пользователя.
+
+Taste нужно пропускать для обычных bugfix, responsive regression, точного reference/screenshot matching, сохранения утверждённого design system, accessibility remediation, мелких визуальных правок и release QA без redesign.
+
+На одну задачу выбирается **один art-direction authority**:
+
+- существующий утверждённый дизайн проекта, если его нужно сохранить;
+- Taste, если действительно разрешена новая/заменяющая концепция;
+- design-direction возможности Impeccable только если Taste не выбран, а направление всё ещё нужно.
+
+Если направление задал Taste, Impeccable может делать critique/polish внутри него, но не должен запускать конкурирующий redesign. Собственный inspector/look-fix loop Taste не заменяет viewport matrix, visual QA, accessibility QA, regression closure и completion evidence нашего suite.
+
+Taste является **recommended**, но не required и не bundled. Suite проверяет его только при срабатывании Taste routing. Если skill отсутствует или author-owned plugin имеет более новую live-версию, оркестратор предлагает точную native Codex установку/обновление и применяет её только после явного разрешения.
 
 ## Bundled accessibility specialist
 
@@ -122,12 +142,36 @@ Suite включает собственный `frontend-accessibility-qa`, ко�
 
 Accessibility specialist поддерживается внутри этого репозитория. Внешние WCAG/APCA agent skills используются только как reference sources и не являются runtime dependencies.
 
+## Live specialist preflight
+
+Внешний specialist не считается доступным только потому, что оркестратор на него ссылается.
+
+После классификации задачи suite выводит точный набор required/triggered specialists и перед первым использованием выполняет **read-only live preflight**:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+Registry `skills/frontend-production-qa/specialists.json` хранит только identity provider-а, repository, install channel и moving **current channel**. **Текущие номера версий внешних skills в нём намеренно не хранятся.**
+
+Для npm-distributed providers вроде Impeccable и Motion authoritative current installable release определяется по настроенному npm dist-tag `latest`. Default branch репозитория автора остаётся источником provenance, документации и payload/reference checks, но его package version не обязана совпадать с npm `latest`.
+
+Preflight различает, в частности, `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` и состояния с недостаточной remote/local evidence.
+
+Если установка/обновление допустимы, оркестратор сначала показывает точное provider-native действие из `specialists.json` и ничего не меняет без явного разрешения.
+
+Для Codex-plugin используется только exact author-owned marketplace/plugin identity после проверки ownership. Для provider CLI/installers используется текущая точная команда из registry, включая `@latest`, где это предусмотрено. Отдельного самописного package-manager wrapper нет, как и общего «update everything».
+
+После mutation повторяется live preflight, при необходимости открывается свежая Codex session и разрешается exact Skill ID. Наличие package/skill на диске само по себе не доказывает активную загрузку.
+
 ## Основной workflow
 
 ```text
 правила проекта
+  -> классификация задачи + live specialist preflight
   -> анализ и воспроизведение
   -> optional design references, если действительно нужны
+  -> conditional Taste art direction, если нужна
   -> accessibility design guard, если нужен
   -> frontend implementation
   -> conditional Motion specialist, если нужен
@@ -192,7 +236,8 @@ Chrome DevTools MCP — из [ChromeDevTools/chrome-devtools-mcp](https://github
 
 Рекомендуемые условные specialists:
 
-- [Impeccable](https://github.com/pbakaus/impeccable) для design-quality critique и polish;
+- [Taste Skill](https://github.com/Leonxlnx/taste-skill) / `design-taste-frontend` для новой или заменяющей art direction;
+- [Impeccable](https://github.com/pbakaus/impeccable) для design-quality critique и polish внутри выбранного направления;
 - [Motion AI Kit](https://github.com/motiondivision/ai-kit) для существенной animation/interaction работы.
 
 Связанные необязательные skills:
@@ -202,7 +247,6 @@ Chrome DevTools MCP — из [ChromeDevTools/chrome-devtools-mcp](https://github
 
 Опционально можно использовать уже установленные:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`

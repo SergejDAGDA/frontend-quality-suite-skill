@@ -31,13 +31,14 @@ recommended:
     provider: pbakaus/impeccable
   - name: motion
     provider: motiondivision/ai-kit
+  - name: design-taste-frontend
+    provider: Leonxlnx/taste-skill
   - name: ui-designer
     provider: daymade/claude-code-skills
   - name: qa-expert
     provider: daymade/claude-code-skills
 
 optional_unmanaged:
-  - taste-skill
   - karpathy-guidelines
   - context-engineering
   - maintain-project-memory

@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "policy": {
+    "task_scoped_preflight": true,
+    "live_current_channel_required": true,
+    "pinned_external_versions_forbidden": true,
+    "mutation_requires_explicit_user_approval": true
+  },
+  "specialists": [
+    {
+      "key": "agent-skills",
+      "class": "required",
+      "skill_ids": [
+        "frontend-ui-engineering",
+        "browser-testing-with-devtools"
+      ],
+      "repository": "addyosmani/agent-skills",
+      "channel": "codex-plugin",
+      "plugin_id": "agent-skills@agent-skills",
+      "marketplace": "agent-skills",
+      "current_channel": {
+        "kind": "author-manifest",
+        "url": "https://raw.githubusercontent.com/addyosmani/agent-skills/main/plugin.json",
+        "property": "version"
+      },
+      "install": {
+        "marketplace_source": "addyosmani/agent-skills"
+      },
+      "fresh_session_required": true
+    },
+    {
+      "key": "taste",
+      "class": "recommended",
+      "skill_ids": [
+        "design-taste-frontend"
+      ],
+      "repository": "Leonxlnx/taste-skill",
+      "channel": "codex-plugin",
+      "plugin_id": "taste-skill@taste-skill",
+      "marketplace": "taste-skill",
+      "current_channel": {
+        "kind": "author-manifest",
+        "url": "https://raw.githubusercontent.com/Leonxlnx/taste-skill/main/.codex-plugin/plugin.json",
+        "property": "version"
+      },
+      "install": {
+        "marketplace_source": "Leonxlnx/taste-skill"
+      },
+      "fresh_session_required": true
+    },
+    {
+      "key": "impeccable",
+      "class": "recommended",
+      "skill_ids": [
+        "impeccable"
+      ],
+      "repository": "pbakaus/impeccable",
+      "channel": "provider-cli",
+      "current_channel": {
+        "kind": "npm-dist-tag",
+        "package": "impeccable",
+        "tag": "latest",
+        "url": "https://registry.npmjs.org/impeccable/latest",
+        "property": "version"
+      },
+      "local_version": {
+        "kind": "skill-frontmatter",
+        "property": "metadata.version"
+      },
+      "install": {
+        "executable": "npx",
+        "args": [
+          "--yes",
+          "impeccable@latest",
+          "install",
+          "--providers=codex",
+          "--scope=global"
+        ]
+      },
+      "update": {
+        "executable": "npx",
+        "args": [
+          "--yes",
+          "impeccable@latest",
+          "update"
+        ]
+      },
+      "fresh_session_required": true,
+      "post_update_note": "Review /hooks in Codex after install/update because hook trust may change."
+    },
+    {
+      "key": "motion",
+      "class": "recommended",
+      "skill_ids": [
+        "motion"
+      ],
+      "repository": "motiondivision/ai-kit",
+      "channel": "provider-installer",
+      "current_channel": {
+        "kind": "npm-dist-tag",
+        "package": "motion-ai",
+        "tag": "latest",
+        "url": "https://registry.npmjs.org/motion-ai/latest",
+        "property": "version"
+      },
+      "author_payload": {
+        "kind": "github-text",
+        "url": "https://raw.githubusercontent.com/motiondivision/ai-kit/main/plugins/motion/skills/motion/SKILL.md"
+      },
+      "local_version": {
+        "kind": "payload-hash"
+      },
+      "install": {
+        "executable": "npx",
+        "args": [
+          "motion-ai@latest"
+        ]
+      },
+      "update": {
+        "executable": "npx",
+        "args": [
+          "motion-ai@latest"
+        ]
+      },
+      "fresh_session_required": true,
+      "post_update_note": "The Motion installer is interactive; choose the intended scope and Codex target, then verify the Motion MCP in the fresh session."
+    }
+  ]
+}

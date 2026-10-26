@@ -20,3 +20,9 @@ jobs:
       - name: Verify accessibility authority and bundled ownership
         shell: pwsh
         run: ./tests/test_accessibility_architecture.ps1
+      - name: Verify Taste design routing and anti-loop authority
+        shell: pwsh
+        run: ./tests/test_design_routing.ps1
+      - name: Verify live specialist preflight and mutation boundaries
+        shell: pwsh
+        run: ./tests/test_specialist_preflight_policy.ps1
