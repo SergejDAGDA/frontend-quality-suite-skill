@@ -26,11 +26,10 @@ Expected capabilities:
 - `frontend-ui-engineering`
 - `browser-testing-with-devtools`
 - `frontend-visual-qa`
+- `frontend-accessibility-qa`
 - Chrome DevTools MCP
 
-`frontend-visual-qa` is bundled with this plugin. Use the bundled copy as the
-version-consistent visual QA layer; do not substitute a separately installed
-upstream copy without reviewing the diff first.
+`frontend-visual-qa` and `frontend-accessibility-qa` are bundled with this plugin. Use the bundled copies as the version-consistent visual and accessibility QA layers; do not substitute separately installed upstream copies without reviewing the diff first.
 
 If a required specialist skill is missing:
 
@@ -89,6 +88,29 @@ For any animation or interaction change:
 - verify the start state, active transition, interruption/reversal when meaningful, and settled end state;
 - treat geometry, sizing, wrapping, visibility, breakpoint, or shared-layout effects as Class A;
 - treat animation-related layout fixes as normal regression-closure changes that invalidate prior visual verification for the affected surface.
+
+## Accessibility authority and routing
+
+Use the bundled `frontend-accessibility-qa` specialist throughout browser-facing work when accessibility can be affected.
+
+Its authority model is:
+
+1. stricter explicit project accessibility/legal requirements;
+2. WCAG 2.2 Level A/AA hard requirements;
+3. functional/browser correctness;
+4. established project design system;
+5. APCA perceptual guidance;
+6. aesthetic preference.
+
+WCAG 2.2 A/AA is the hard accessibility gate. APCA is advisory only and must never waive a WCAG failure or create an endless contrast-remediation loop.
+
+Choose the smallest complete accessibility mode:
+
+- `DESIGN_GUARD` while choosing colors, semantics, focus treatment, target size, interaction, error/help behavior, or reduced-motion behavior;
+- `AFFECTED_AUDIT` after scoped UI changes;
+- `FULL_AUDIT` for substantial new UI, explicit accessibility audits, broad design-system accessibility changes, or release acceptance where WCAG accessibility is in scope.
+
+Do not run a full audit after every trivial frontend edit. Promote scope when shared components, shared semantic tokens, navigation, forms, or broad interaction patterns change.
 
 ## Recommended and optional layers
 
@@ -235,7 +257,23 @@ Do not copy branding, proprietary content, or another site's visual identity.
 
 If the task is an existing-design bug fix or regression, preserve the existing project instead of inventing a new direction.
 
-## Phase 3 — Implement
+## Phase 3 — Accessibility design guard when relevant
+
+Before committing to a design decision that can create accessibility debt, use `frontend-accessibility-qa` in `DESIGN_GUARD` mode.
+
+Typical triggers include:
+
+- text/background and semantic color pairs;
+- focus indicators;
+- interactive target sizing;
+- semantic element choice;
+- keyboard interaction design;
+- form labels/errors/help;
+- animation/reduced-motion behavior.
+
+For contrast, establish the WCAG 2.2 gate first. Use APCA only as an optional perceptual refinement after WCAG passes.
+
+## Phase 4 — Implement
 
 Use `frontend-ui-engineering`.
 
@@ -251,7 +289,7 @@ Avoid:
 - unrelated cleanup;
 - framework migration without approval.
 
-## Phase 4 — Code-level checks
+## Phase 5 — Code-level checks
 
 Run applicable existing checks:
 
@@ -265,7 +303,7 @@ Use TDD when the changed behavior can reasonably be protected by a regression te
 
 A passing build is not evidence that rendered UI is correct.
 
-## Phase 5 — Real browser
+## Phase 6 — Real browser
 
 Use `browser-testing-with-devtools`.
 
@@ -282,7 +320,7 @@ Inspect as applicable:
 
 New relevant console errors caused by the change are blockers.
 
-## Phase 6 — Responsive verification
+## Phase 7 — Responsive verification
 
 Read `references/verification-matrix.md`.
 
@@ -294,7 +332,7 @@ Class C uses targeted verification.
 
 If breakpoint `B` changed or is suspected, also test `B-1`, `B`, and `B+1`.
 
-## Phase 7 — Rendered visual QA
+## Phase 8 — Rendered visual QA
 
 Use `frontend-visual-qa`.
 
@@ -307,6 +345,18 @@ For long pages, inspect below the fold.
 For shared components, inspect representative consuming routes.
 
 Do not update visual baselines merely to silence a regression.
+
+## Phase 9 — Accessibility closure
+
+Use `frontend-accessibility-qa` after implementation.
+
+Default to `AFFECTED_AUDIT` for ordinary scoped UI work.
+
+Use `FULL_AUDIT` only when the task scope warrants it, including substantial new UI, explicit WCAG/a11y audits, broad design-system accessibility work, or release acceptance that includes accessibility.
+
+Accessibility checks reuse the existing real-browser and responsive evidence where valid. Do not create a second independent viewport matrix merely because accessibility is being checked.
+
+If APCA produces an advisory concern after WCAG passes, it may justify one refinement cycle. It must not repeatedly reopen an otherwise completed hard-gate remediation loop unless new evidence identifies a WCAG failure, functional defect, or stricter explicit project requirement.
 
 ## Regression closure
 
@@ -327,7 +377,7 @@ Any later change to:
 
 invalidates previous visual verification for the affected surface.
 
-After the fix, rerun the applicable browser and viewport verification.
+After the fix, rerun the applicable browser, viewport, visual, and accessibility verification invalidated by the change.
 
 Do not retest only the originally failing viewport.
 
@@ -371,6 +421,8 @@ Before reporting completion, state:
 - browser checks run;
 - console status;
 - visual QA status;
+- accessibility mode used and WCAG status;
+- APCA advisory status if APCA was used;
 - shared consumers checked;
 - anything blocked or unverified.
 
@@ -381,3 +433,4 @@ Read:
 - `references/verification-matrix.md`
 - `references/dependencies.md`
 - `references/toolchain-maintenance.md`
+- bundled `../frontend-accessibility-qa/SKILL.md`
