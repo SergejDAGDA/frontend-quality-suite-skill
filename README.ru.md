@@ -96,15 +96,17 @@ Inspo не становится источником дизайна сущест
 
 Он подключается условно для сложной анимации, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, работы с Motion API и диагностики animation performance.
 
-Это **recommended**, но не required и не bundled dependency. Suite не устанавливает и не обновляет Motion автоматически.
+Это **recommended**, но не required и не bundled dependency. Suite проверяет Motion только тогда, когда задача действительно его триггерит. Актуальность читается из live author/distribution sources; версия Motion не закрепляется в нашем repository.
 
-Официальная установка выполняется отдельно:
+Если Motion отсутствует или его payload отличается от текущего payload автора, оркестратор до применения предлагает точную provider-specific установку/обновление. Изменение окружения всё равно требует явного разрешения пользователя.
+
+Текущий provider installer вызывается так:
 
 ```powershell
-npx motion-ai
+npx motion-ai@latest
 ```
 
-Installer может изменять skill files и hosted MCP configuration, поэтому запускать его можно только как отдельное явно разрешённое действие.
+Installer может изменять skill files и hosted MCP configuration, поэтому действие остаётся явным и разрешённым пользователем.
 
 Для простых hover/focus/press/fade/loading эффектов нужно предпочитать CSS, если его достаточно. Нельзя добавлять Motion runtime только из-за наличия agent skill. Нужно соблюдать reduced-motion/accessibility требования и проверять существенные animated states в реальном браузере.
 
@@ -124,7 +126,7 @@ Taste нужно пропускать для обычных bugfix, responsive r
 
 Если направление задал Taste, Impeccable может делать critique/polish внутри него, но не должен запускать конкурирующий redesign. Собственный inspector/look-fix loop Taste не заменяет viewport matrix, visual QA, accessibility QA, regression closure и completion evidence нашего suite.
 
-Taste является **recommended**, но не required и не bundled. Suite не устанавливает и не обновляет его автоматически.
+Taste является **recommended**, но не required и не bundled. Suite проверяет его только при срабатывании Taste routing. Если skill отсутствует или author-owned plugin имеет более новую live-версию, оркестратор предлагает точную native Codex установку/обновление и применяет её только после явного разрешения.
 
 ## Bundled accessibility specialist
 
@@ -140,10 +142,37 @@ Suite включает собственный `frontend-accessibility-qa`, ко�
 
 Accessibility specialist поддерживается внутри этого репозитория. Внешние WCAG/APCA agent skills используются только как reference sources и не являются runtime dependencies.
 
+## Live specialist preflight
+
+Внешний specialist не считается доступным только потому, что оркестратор на него ссылается.
+
+После классификации задачи suite выводит точный набор required/triggered specialists и перед первым использованием выполняет **read-only live preflight**:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+Registry `skills/frontend-production-qa/specialists.json` хранит только identity provider-а, repository, install channel и live version/payload sources. **Текущие номера версий внешних skills в нём намеренно не хранятся.**
+
+Актуальность определяется во время preflight по текущему источнику автора. Для npm-distributed providers вроде Impeccable и Motion author manifest дополнительно сравнивается с текущей official distribution metadata, чтобы неопубликованное или рассинхронизированное состояние не выдавалось за доступное обновление.
+
+Preflight различает, в частности, `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` и состояния с недостаточной remote/local evidence.
+
+Если установка/обновление допустимы, оркестратор сначала показывает план для одного конкретного specialist:
+
+```powershell
+.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
+```
+
+Только после явного разрешения тот же вызов выполняется с `-Apply`. Executor изменяет ровно одного provider-а, проверяет owner/provenance, делает postflight и никогда не выполняет общий «update everything».
+
+Наличие package/skill на диске не доказывает загрузку в текущую сессию Codex. После mutation, требующей reload, нужно открыть свежую сессию и разрешить exact Skill ID прежде, чем считать соответствующий этап реально выполненным.
+
 ## Основной workflow
 
 ```text
 правила проекта
+  -> классификация задачи + live specialist preflight
   -> анализ и воспроизведение
   -> optional design references, если действительно нужны
   -> conditional Taste art direction, если нужна
