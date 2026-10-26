@@ -10,7 +10,7 @@
 
 **GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Bundled Skill ID:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
 
-**Текущая версия plugin:** `1.4.1` в `main`. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
+**Источник версии:** текущая версия plugin объявляется только в `plugin.json`. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
 
 ## Зачем он нужен
 
@@ -108,6 +108,24 @@ Installer может изменять skill files и hosted MCP configuration, �
 
 Для простых hover/focus/press/fade/loading эффектов нужно предпочитать CSS, если его достаточно. Нельзя добавлять Motion runtime только из-за наличия agent skill. Нужно соблюдать reduced-motion/accessibility требования и проверять существенные animated states в реальном браузере.
 
+## Условный Taste art-direction specialist
+
+Когда frontend-задаче действительно нужна новая или заменяющая визуальная концепция, оркестратор может использовать внешний skill `design-taste-frontend` из [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill).
+
+Он нужен для выразительных новых landing/marketing/public страниц, portfolio/showcase, осознанного redesign/restyle, явного запроса убрать generic/"AI-made" вид или создать новую визуальную систему app/dashboard по запросу пользователя.
+
+Taste нужно пропускать для обычных bugfix, responsive regression, точного reference/screenshot matching, сохранения утверждённого design system, accessibility remediation, мелких визуальных правок и release QA без redesign.
+
+На одну задачу выбирается **один art-direction authority**:
+
+- существующий утверждённый дизайн проекта, если его нужно сохранить;
+- Taste, если действительно разрешена новая/заменяющая концепция;
+- design-direction возможности Impeccable только если Taste не выбран, а направление всё ещё нужно.
+
+Если направление задал Taste, Impeccable может делать critique/polish внутри него, но не должен запускать конкурирующий redesign. Собственный inspector/look-fix loop Taste не заменяет viewport matrix, visual QA, accessibility QA, regression closure и completion evidence нашего suite.
+
+Taste является **recommended**, но не required и не bundled. Suite не устанавливает и не обновляет его автоматически.
+
 ## Bundled accessibility specialist
 
 Suite включает собственный `frontend-accessibility-qa`, который является accessibility authority для browser-facing работы.
@@ -128,6 +146,7 @@ Accessibility specialist поддерживается внутри этого р
 правила проекта
   -> анализ и воспроизведение
   -> optional design references, если действительно нужны
+  -> conditional Taste art direction, если нужна
   -> accessibility design guard, если нужен
   -> frontend implementation
   -> conditional Motion specialist, если нужен
@@ -192,7 +211,8 @@ Chrome DevTools MCP — из [ChromeDevTools/chrome-devtools-mcp](https://github
 
 Рекомендуемые условные specialists:
 
-- [Impeccable](https://github.com/pbakaus/impeccable) для design-quality critique и polish;
+- [Taste Skill](https://github.com/Leonxlnx/taste-skill) / `design-taste-frontend` для новой или заменяющей art direction;
+- [Impeccable](https://github.com/pbakaus/impeccable) для design-quality critique и polish внутри выбранного направления;
 - [Motion AI Kit](https://github.com/motiondivision/ai-kit) для существенной animation/interaction работы.
 
 Связанные необязательные skills:
@@ -202,7 +222,6 @@ Chrome DevTools MCP — из [ChromeDevTools/chrome-devtools-mcp](https://github
 
 Опционально можно использовать уже установленные:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`
