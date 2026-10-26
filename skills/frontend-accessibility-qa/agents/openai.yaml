@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Accessibility QA"
+  short_description: "WCAG 2.2 AA accessibility checks with APCA advisory contrast guidance"
+  default_prompt: "Use $frontend-accessibility-qa to choose the smallest complete accessibility audit mode, treat WCAG 2.2 A/AA as the hard gate, use APCA only as advisory perceptual guidance, and report evidence without overstating conformance."
