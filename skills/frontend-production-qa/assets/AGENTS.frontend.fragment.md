@@ -10,4 +10,6 @@ Keep project-specific architecture, product, legal, accessibility, design, relea
 
 Let `frontend-production-qa` route accessibility-sensitive work through the bundled `frontend-accessibility-qa` specialist. WCAG 2.2 A/AA remains the hard gate when in scope; APCA is advisory and must not override WCAG or established project requirements.
 
+For design-direction work, use one art-direction authority per task. Preserve an approved project design when required; otherwise `design-taste-frontend` may provide a new/replacement art direction when explicitly warranted. If Taste sets the direction, Impeccable may critique/polish inside it but must not start a competing redesign, and final visual/accessibility QA stays authoritative.
+
 Do not install, update, or repair third-party frontend skills during normal development work. Toolchain bootstrap and updates are explicit maintenance operations.
