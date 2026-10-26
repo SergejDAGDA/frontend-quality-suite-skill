@@ -127,6 +127,7 @@ $blockedStatuses = @(
     "UNKNOWN_DISTRIBUTION",
     "UNKNOWN_LOCAL",
     "SOURCE_DIVERGENCE",
+    "PROVENANCE_UNKNOWN",
     "DIFFERENT"
 )
 if ($blockedStatuses -contains $row.status) {
@@ -203,7 +204,7 @@ Write-Host "  status: $($post.status)"
 if ($post.installed_version) { Write-Host "  installed: $($post.installed_version)" }
 if ($post.author_version) { Write-Host "  author current: $($post.author_version)" }
 
-if ($post.status -notin @("INSTALLED_CURRENT", "UPDATE_RECOMMENDED")) {
+if ($post.status -ne "INSTALLED_CURRENT") {
     throw "[NOT VERIFIED] Mutation completed but postflight did not establish a current/usable package state."
 }
 
