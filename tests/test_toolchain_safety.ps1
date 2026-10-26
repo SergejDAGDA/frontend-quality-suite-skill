@@ -2,7 +2,9 @@ $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $base = Join-Path $root "skills\frontend-production-qa\scripts"
 $updater = Join-Path $base "update-frontend-toolchain.ps1"
+$bootstrap = Join-Path $base "bootstrap-frontend-toolchain.ps1"
 $readiness = Join-Path $base "check-frontend-toolchain.ps1"
+$dependencyManifest = Join-Path $root "skills\frontend-production-qa\dependencies.yaml"
 $pwsh = (Get-Command pwsh -ErrorAction Stop).Source
 
 # Expected failure tests must run in CHILD processes. An in-process
@@ -40,6 +42,28 @@ $source = Get-Content -LiteralPath $updater -Raw
 if ($source -match '(?m)^\s*&\s*codex\s+plugin\s+marketplace\s+upgrade(?:\s|$)' -or
     $source -match '(?m)^\s*&\s*npx(?:\s|$)') {
     throw "Update script contains an executable package mutation"
+}
+
+# Motion is a conditional external recommendation. The suite must not silently
+# promote it into required/bundled ownership or wire its installer into managed
+# bootstrap/update scripts.
+$manifest = Get-Content -LiteralPath $dependencyManifest -Raw
+$requiredBlock = [regex]::Match($manifest, '(?ms)^required:\s*(?<body>.*?)(?=^bundled:)').Groups['body'].Value
+$bundledBlock = [regex]::Match($manifest, '(?ms)^bundled:\s*(?<body>.*?)(?=^recommended:)').Groups['body'].Value
+$recommendedBlock = [regex]::Match($manifest, '(?ms)^recommended:\s*(?<body>.*?)(?=^optional_unmanaged:)').Groups['body'].Value
+
+if ($requiredBlock -match '(?m)^\s*- name:\s*motion\s*$' -or
+    $bundledBlock -match '(?m)^\s*- name:\s*motion\s*$') {
+    throw "Motion drifted into required or bundled ownership"
+}
+if ($recommendedBlock -notmatch '(?ms)^\s*- name:\s*motion\s*\r?\n\s+provider:\s*motiondivision/ai-kit\s*$') {
+    throw "Motion is not declared as the expected recommended external specialist"
+}
+
+$managedSources = (Get-Content -LiteralPath $updater -Raw) + [Environment]::NewLine +
+                  (Get-Content -LiteralPath $bootstrap -Raw)
+if ($managedSources -match 'motion-ai') {
+    throw "Motion installer was wired into managed bootstrap/update scripts"
 }
 
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ("frontend-toolchain-fixture-" + [guid]::NewGuid().ToString("N"))

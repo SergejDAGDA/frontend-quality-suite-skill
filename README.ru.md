@@ -8,7 +8,7 @@
 
 **GitHub-репозиторий:** `SergejDAGDA/frontend-quality-suite-skill`. **ID установленного плагина:** `frontend-production-qa@codex-frontend-production-qa` (без изменений). **Два Skill ID:** `$frontend-production-qa` и `$frontend-visual-qa` (без изменений). ID Marketplace специально сохранён для совместимости с уже установленной нативной регистрацией Codex.
 
-**Версия-кандидат:** `1.2.4` в данном PR. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
+**Версия-кандидат:** `1.3.0` в отдельном Motion PR, построенном поверх migration PR репозитория. Переименование GitHub не обновляет локальный Marketplace checkout или кеш плагина. Если origin прежней установки содержит `codex-frontend-production-qa`, строгая проверка владения после смены ожидаемого URL может вернуть CONFLICT; её нельзя обходить или автоматически перерегистрировать. Изменения установки требуют отдельного разрешения и проверки. Поддержка других агентов не заявляется как протестированная.
 
 ## Зачем он нужен
 
@@ -88,6 +88,24 @@ Inspo не становится источником дизайна сущест
 
 Отдельная команда `codex mcp add inspo ...` при plugin-установке не нужна.
 
+## Условный Motion specialist
+
+Для задач с существенной анимацией оркестратор может использовать официальный внешний skill `motion` из [Motion AI Kit](https://github.com/motiondivision/ai-kit).
+
+Он подключается условно для сложной анимации, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, работы с Motion API и диагностики animation performance.
+
+Это **recommended**, но не required и не bundled dependency. Suite не устанавливает и не обновляет Motion автоматически.
+
+Официальная установка выполняется отдельно:
+
+```powershell
+npx motion-ai
+```
+
+Installer может изменять skill files и hosted MCP configuration, поэтому запускать его можно только как отдельное явно разрешённое действие.
+
+Для простых hover/focus/press/fade/loading эффектов нужно предпочитать CSS, если его достаточно. Нельзя добавлять Motion runtime только из-за наличия agent skill. Нужно соблюдать reduced-motion/accessibility требования и проверять существенные animated states в реальном браузере.
+
 ## Основной workflow
 
 ```text
@@ -95,6 +113,7 @@ Inspo не становится источником дизайна сущест
   -> анализ и воспроизведение
   -> optional design references, если действительно нужны
   -> frontend implementation
+  -> conditional Motion specialist, если нужен
   -> design-quality слой, если нужен
   -> code checks
   -> реальный браузер
@@ -152,9 +171,10 @@ Workflow ожидает:
 
 Chrome DevTools MCP — из [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp).
 
-Рекомендуемый design-quality слой:
+Рекомендуемые условные specialists:
 
-- [Impeccable](https://github.com/pbakaus/impeccable)
+- [Impeccable](https://github.com/pbakaus/impeccable) для design-quality critique и polish;
+- [Motion AI Kit](https://github.com/motiondivision/ai-kit) для существенной animation/interaction работы.
 
 Связанные необязательные skills:
 
