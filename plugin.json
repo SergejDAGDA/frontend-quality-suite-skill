@@ -25,7 +25,7 @@
   "interface": {
     "displayName": "Frontend Production QA",
     "shortDescription": "Production frontend workflow with real-browser and responsive QA",
-    "longDescription": "Orchestrates frontend implementation, conditional art direction, responsive verification, rendered visual QA, WCAG 2.2 accessibility closure, regression closure, shared-component checks, conditional Motion guidance, and review gates. Includes optional Inspo MCP references and conditional Taste Skill routing for new or substantially redesigned interfaces.",
+    "longDescription": "Orchestrates frontend implementation with live task-scoped specialist preflight, conditional art direction, responsive verification, rendered visual QA, WCAG 2.2 accessibility closure, regression closure, shared-component checks, conditional Motion guidance, and review gates. External specialist freshness is checked from live author sources before use; mutations remain explicit and component-scoped.",
     "developerName": "Sergej DAGDA",
     "category": "Developer Tools",
     "capabilities": [
