@@ -14,11 +14,11 @@ No external specialist version is stored as "current" in this repository.
 - provider/repository identity;
 - required/recommended class;
 - install/update channel;
-- live author version/payload source;
-- optional official distribution version source;
+- a moving current provider channel;
+- optional payload/reference source when semantic version evidence is unavailable locally;
 - activation/reload requirements.
 
-Currentness must be read live from the provider at task time.
+Current installable-version truth must be resolved live from the configured provider channel at task time. For npm-distributed tools, prefer the configured dist-tag such as `latest`; repository `main` is source code, not automatically the current installable release.
 
 Historical changelog entries and prior conversations are never freshness evidence.
 
@@ -50,7 +50,7 @@ Do not preflight unrelated recommended specialists merely because they exist in 
 
 ### INSTALLED_CURRENT
 
-Package/payload matches the current live author source.
+Package/payload matches the configured moving current provider channel.
 
 This is package-level evidence only. The current Codex Desktop session must still resolve the exact Skill ID before use.
 
@@ -90,12 +90,6 @@ A package exists but its author-owned marketplace/source cannot be verified.
 
 Do not call it current or safe to update.
 
-### SOURCE_DIVERGENCE
-
-The author's source manifest and the official install distribution disagree.
-
-Do not guess which is current. Inspect provider release/install guidance.
-
 ### UNKNOWN_REMOTE / UNKNOWN_DISTRIBUTION / UNKNOWN_LOCAL / DIFFERENT
 
 Evidence is incomplete or cannot be safely ordered.
@@ -121,9 +115,9 @@ Channel:
 
 - native Codex plugin `agent-skills@agent-skills`
 
-Author source:
+Current channel:
 
-- `addyosmani/agent-skills`
+- author-owned `addyosmani/agent-skills`
 - live `plugin.json`
 
 Installation/update uses the exact author-owned marketplace/plugin only.
@@ -143,9 +137,9 @@ Repository/plugin:
 
 The directory/plugin name `taste-skill` is not the Skill ID.
 
-Author source:
+Current channel:
 
-- live `.codex-plugin/plugin.json`
+- live author-owned `.codex-plugin/plugin.json`
 
 Use the native Codex plugin channel. Verify marketplace Git origin and catalog source before install/update.
 
@@ -155,19 +149,18 @@ Skill ID:
 
 - `impeccable`
 
-Author source:
+Current installable channel:
 
-- live `pbakaus/impeccable/package.json`
+- npm package `impeccable`
+- dist-tag `latest`
 
-Official install distribution:
-
-- current npm `impeccable` metadata
+The repository remains the owner/provenance and documentation source, but repository `package.json` is not required to match the published npm `latest` version.
 
 Installed version evidence:
 
 - `metadata.version` in the discovered `impeccable` Skill frontmatter
 
-The author manifest and npm distribution must agree before an automatic update is offered.
+The installed Skill frontmatter version is compared directly with npm `latest` before an update is offered.
 
 Approved install:
 
@@ -189,15 +182,17 @@ Skill ID:
 
 - `motion`
 
-Author source:
+Current installable channel:
+
+- npm package `motion-ai`
+- dist-tag `latest`
+
+Author payload/reference source:
 
 - `motiondivision/ai-kit`
-- live `packages/motion-ai/package.json`
 - live `plugins/motion/skills/motion/SKILL.md`
 
-Official install distribution:
-
-- current npm `motion-ai` metadata
+The repository package version is not used as the installable-version authority.
 
 The installed Motion Skill does not expose a reliable local semantic version. Therefore preflight compares normalized Skill payload content with the author's current payload and reports `UPDATE_RECOMMENDED` when they differ.
 
@@ -298,8 +293,7 @@ Safety properties:
 
 - exactly one provider/action per approved mutation;
 - no global or unnamed marketplace upgrade;
-- live author version/payload evidence required;
-- distribution/source divergence blocks mutation;
+- live current-channel evidence required;
 - duplicate Skill IDs block mutation;
 - native plugin marketplace Git origin/catalog ownership is checked before mutation;
 - package-level postflight is required;
@@ -317,7 +311,7 @@ That finding still matters.
 v1.5.0 does **not** restore broad automatic updates. Instead it permits a narrower operation after explicit approval:
 
 - one exact provider;
-- verified current author source;
+- verified moving current provider channel;
 - verified owner/provenance where applicable;
 - provider-native install/update path;
 - postflight;
