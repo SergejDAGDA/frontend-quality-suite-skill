@@ -46,9 +46,10 @@ which dependency to ask about. Detection is read-only; any mutation still
 requires explicit approval for the exact provider/action.
 
 Do not store a remembered "current version" for external specialists here.
-Use `specialists.json` plus `preflight-frontend-specialists.ps1` to read
-the current author source live. For npm-distributed providers, compare the
-author manifest with current distribution metadata before offering mutation.
+Use `specialists.json` plus `preflight-frontend-specialists.ps1` to resolve
+the configured moving current provider channel live. For npm-distributed
+providers, the configured dist-tag (normally `latest`) is the authoritative
+current installable release; repository `main` is not required to match it.
 
 ## Task-time live specialist preflight
 
@@ -64,12 +65,12 @@ Primary read-only check:
 .\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
 ```
 
-The registry contains provider identity, repository, install channel and live
-author/distribution source metadata, but no pinned current external versions.
+The registry contains provider identity, repository, install channel and a
+moving current provider channel, but no pinned current external versions.
 
 When preflight reports an installable/updateable state, show the exact official provider action from `specialists.json`. Only after explicit approval may the orchestrator execute that one provider-native action directly.
 
-Duplicate IDs, source divergence, unknown provenance and unverifiable live current-version evidence block mutation. Do not add a second custom package-manager wrapper around the provider's own Codex plugin or CLI/installer channel.
+Duplicate IDs, unknown provenance and unverifiable live current-channel evidence block mutation. Do not add a second custom package-manager wrapper around the provider's own Codex plugin or CLI/installer channel.
 
 ## Guided installation boundary
 
@@ -238,8 +239,8 @@ codex plugin marketplace upgrade taste-skill
 codex plugin add taste-skill@taste-skill
 ```
 
-Before either path, task-time preflight verifies the current live author
-manifest and marketplace owner/provenance. Start a fresh Codex session after
+Before either path, task-time preflight resolves the live author-owned plugin
+channel and verifies marketplace owner/provenance. Start a fresh Codex session after
 installation/update and resolve the exact `design-taste-frontend` Skill ID.
 
 Upstream also documents direct skill installation through the agent-skills CLI, but this suite prefers the native Codex plugin route when operating in Codex.
@@ -270,9 +271,9 @@ Targeted update:
 npx --yes impeccable@latest update
 ```
 
-Preflight compares the live author package manifest with the current official
-npm distribution and the installed Skill frontmatter version before offering
-either mutation.
+Preflight compares the installed Skill frontmatter version directly with npm
+`latest` before offering either mutation. The repository package manifest is
+not required to match the published npm channel.
 
 After install/update, Codex users may need to review/approve the project hook with `/hooks`.
 
