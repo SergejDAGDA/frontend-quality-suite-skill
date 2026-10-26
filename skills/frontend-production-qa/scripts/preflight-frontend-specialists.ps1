@@ -173,7 +173,7 @@ function New-Result {
 }
 
 function Test-AuthorDistribution {
-    param($Spec, [hashtable]$Result)
+    param($Spec, [System.Collections.IDictionary]$Result)
     if ($Spec.author_version) {
         $Result.author_version = Get-LiveJsonValue -Url $Spec.author_version.url -Property $Spec.author_version.property
     }
