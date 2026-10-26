@@ -19,7 +19,7 @@ if ($matches.Count -ne 1) {
 $spec = $matches[0]
 
 function Invoke-Preflight {
-    $json = (& pwsh -NoLogo -NoProfile -NonInteractive -File $preflightPath -SkillId $spec.key -Json 2>&1 | Out-String)
+    $json = (& $preflightPath -SkillId $spec.key -Json 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0 -or -not $json.Trim()) {
         throw "Specialist preflight failed: $json"
     }
