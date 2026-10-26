@@ -183,6 +183,43 @@ Use the specialist for substantial animation, transition orchestration, layout m
 
 Do not install the Motion runtime package solely because the agent skill is present. Project dependency policy remains authoritative.
 
+### Taste Skill
+
+The upstream repository/plugin is:
+
+https://github.com/Leonxlnx/taste-skill
+
+The current Skill ID is:
+
+```text
+design-taste-frontend
+```
+
+The repository/plugin name `taste-skill` is not the Skill ID.
+
+Native Codex plugin installation:
+
+```powershell
+codex plugin marketplace add Leonxlnx/taste-skill
+codex plugin add taste-skill@taste-skill
+```
+
+Start a fresh Codex session after installation.
+
+Upstream also documents direct skill installation through the agent-skills CLI, but this suite prefers the native Codex plugin route when operating in Codex.
+
+Treat Taste as a **conditional external recommendation**, not as required or bundled content.
+
+Use it when a task genuinely needs new/replacement art direction: distinctive landing/marketing/public pages, portfolios/showcases, deliberate redesign/restyle, explicitly anti-generic work, or a new app/dashboard visual world when the user requests one.
+
+Skip it for ordinary bug fixes, responsive regressions, exact reference matching, faithful maintenance of an established design system, accessibility remediation, small visual corrections, or release QA without redesign.
+
+Taste owns art direction only when selected. Its browser inspector and internal look/fix rounds do not replace the suite's viewport matrix, bundled visual QA, bundled accessibility QA, regression closure, or completion evidence.
+
+If Taste selects the direction, Impeccable may critique/polish inside that direction but must not start a competing redesign unless the user explicitly reopens art direction. Do not alternate Taste and Impeccable as competing remediation loops.
+
+Taste currently requires Node 22+ and Chrome, Edge, or Chromium for its own scripts. Do not silently install or update it from this suite's bootstrap/update scripts.
+
 ### Impeccable
 
 Install globally for Codex:
@@ -206,7 +243,6 @@ Do not automatically initialize Impeccable in mature projects with an establishe
 
 The orchestrator may use already installed:
 
-- `taste-skill`
 - `karpathy-guidelines`
 - `context-engineering`
 - `maintain-project-memory`
