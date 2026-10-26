@@ -40,9 +40,42 @@ plugin registration and current Desktop session load. No single one of those
 proves all the others. Host MCP configuration, active MCP startup and browser
 connectivity likewise require separate evidence.
 
-Use one explicit approval for the known missing REQUIRED set. RECOMMENDED
-and OPTIONAL components are opt-in. Do not automatically update or replace
-an independently maintained bundle when its upstream repository changes.
+The task-time orchestrator must proactively detect missing or stale REQUIRED
+and task-triggered RECOMMENDED specialists. The user does not need to know
+which dependency to ask about. Detection is read-only; any mutation still
+requires explicit approval for the exact provider/action.
+
+Do not store a remembered "current version" for external specialists here.
+Use `specialists.json` plus `preflight-frontend-specialists.ps1` to read
+the current author source live. For npm-distributed providers, compare the
+author manifest with current distribution metadata before offering mutation.
+
+## Task-time live specialist preflight
+
+Primary runtime source registry:
+
+```text
+skills/frontend-production-qa/specialists.json
+```
+
+Primary read-only check:
+
+```powershell
+.\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
+```
+
+The registry contains provider identity, repository, install channel and live
+author/distribution source metadata, but no pinned current external versions.
+
+When preflight reports an installable/updateable state, plan one component:
+
+```powershell
+.\scripts\manage-frontend-specialist.ps1 -SkillId <exact-skill-id> -Action <install|update>
+```
+
+Only after explicit approval may the same invocation be run with `-Apply`.
+Duplicate IDs, source divergence, unknown provenance and unverifiable live
+current-version evidence block automatic mutation.
 
 ## Guided installation boundary
 
@@ -165,10 +198,10 @@ Documentation:
 
 https://motion.dev/docs/ai-kit
 
-Official installer:
+Official current installer used after explicit approval:
 
 ```powershell
-npx motion-ai
+npx motion-ai@latest
 ```
 
 Official upgrade path:
@@ -204,7 +237,16 @@ codex plugin marketplace add Leonxlnx/taste-skill
 codex plugin add taste-skill@taste-skill
 ```
 
-Start a fresh Codex session after installation.
+Targeted update:
+
+```powershell
+codex plugin marketplace upgrade taste-skill
+codex plugin add taste-skill@taste-skill
+```
+
+Before either path, task-time preflight verifies the current live author
+manifest and marketplace owner/provenance. Start a fresh Codex session after
+installation/update and resolve the exact `design-taste-frontend` Skill ID.
 
 Upstream also documents direct skill installation through the agent-skills CLI, but this suite prefers the native Codex plugin route when operating in Codex.
 
@@ -222,18 +264,21 @@ Taste currently requires Node 22+ and Chrome, Edge, or Chromium for its own scri
 
 ### Impeccable
 
-Install globally for Codex:
+Install globally for Codex after explicit approval:
 
 ```powershell
-npx impeccable install --providers=codex --scope=global
+npx --yes impeccable@latest install --providers=codex --scope=global
 ```
 
-Check/update:
+Targeted update:
 
 ```powershell
-npx impeccable check
-npx impeccable update
+npx --yes impeccable@latest update
 ```
+
+Preflight compares the live author package manifest with the current official
+npm distribution and the installed Skill frontmatter version before offering
+either mutation.
 
 After install/update, Codex users may need to review/approve the project hook with `/hooks`.
 
