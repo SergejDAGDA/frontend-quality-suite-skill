@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.1
+
+Documentation consistency after the 1.4.0 accessibility merge:
+
+- Replace stale "version candidate" wording in the English and Russian READMEs with the current main version.
+- No functional, dependency, routing, accessibility-policy, or runtime behavior changes.
+
 ## 1.4.0
 
 Bundled accessibility architecture:
