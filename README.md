@@ -8,7 +8,7 @@ It does not replace specialist skills. It orchestrates them, defines how deeply 
 
 **GitHub repository:** `SergejDAGDA/frontend-quality-suite-skill`. **Installed plugin ID:** `frontend-production-qa@codex-frontend-production-qa` (unchanged). **Bundled Skill IDs:** `$frontend-production-qa`, `$frontend-visual-qa`, `$frontend-accessibility-qa`. The Marketplace ID intentionally retains its historical name to avoid an unapproved change to an existing native Codex registration.
 
-**Version candidate:** `1.4.0` in the accessibility-architecture PR. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
+**Current plugin version:** `1.4.1` on `main`. Renaming the GitHub repository does not update the installed Marketplace checkout or cached plugin. An existing checkout whose origin still names `codex-frontend-production-qa` may fail the strict ownership check after the expected repository changes; do not bypass or silently re-register it. Verify and separately approve the native migration before installation. Do not assume support for other agent hosts has been tested.
 
 ## Why this exists
 
