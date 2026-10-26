@@ -60,16 +60,16 @@ Before first use of any external specialist in the task, run:
 
 Batch multiple selected Skill IDs when useful. Run the live check once per selected provider per session unless the task scope changes or a mutation occurs.
 
-The preflight registry stores **identity, owner, install channel, and live author/distribution source only**. It must not pin a remembered external version. Current-version truth must be read from the author's live source at preflight time. Do not use versions remembered from this file, README text, changelog history, prior conversations, or model knowledge as freshness evidence.
+The preflight registry stores **identity, owner, install channel, and a moving current provider channel only**. It must not pin a remembered external version. Current installable-version truth must be resolved from that live channel at preflight time. For npm-distributed tools, the authoritative installable channel is the configured npm dist-tag (normally `latest`), not the version currently present on the repository default branch. Do not use versions remembered from this file, README text, changelog history, prior conversations, or model knowledge as freshness evidence.
 
 Interpret preflight states as follows:
 
-- `INSTALLED_CURRENT` — package/payload matches the current author source; still resolve the exact Skill ID in the current Codex session before claiming it ran;
+- `INSTALLED_CURRENT` — package/payload matches the configured moving current channel; still resolve the exact Skill ID in the current Codex session before claiming it ran;
 - `UPDATE_AVAILABLE` / `UPDATE_RECOMMENDED` — proactively tell the user before use and offer the exact provider-specific update;
 - `MISSING` / `MARKETPLACE_MISSING` — proactively tell the user and offer the exact author-owned installation;
 - `DISABLED` — do not pretend the specialist is usable; enable through the native provider flow and start a fresh session;
 - `CONFLICT` — duplicate IDs or ownership disagreement; do not install/update/use the ambiguous specialist until resolved;
-- `PROVENANCE_UNKNOWN`, `SOURCE_DIVERGENCE`, `UNKNOWN_REMOTE`, `UNKNOWN_DISTRIBUTION`, `UNKNOWN_LOCAL`, or `DIFFERENT` — do not claim currentness and do not mutate automatically; resolve evidence/provenance first.
+- `PROVENANCE_UNKNOWN`, `UNKNOWN_REMOTE`, `UNKNOWN_DISTRIBUTION`, `UNKNOWN_LOCAL`, or `DIFFERENT` — do not claim currentness and do not mutate automatically; resolve evidence/provenance first.
 
 A cache hit or readable `SKILL.md` is not proof that the current Codex Desktop session loaded that specialist. Before invoking a specialist, resolve the exact Skill ID in the active session. If package-level preflight passes but the current session cannot resolve it, classify it operationally as `INSTALLED_NOT_ACTIVE`, require a fresh session, and do not claim that specialist phase ran.
 
@@ -248,14 +248,14 @@ A missing or stale specialist is a user-visible preflight finding, not a reason 
 
 ### Dependency installation and update handoff
 
-`scripts/preflight-frontend-specialists.ps1` is the primary task-time check for required and triggered recommended specialists. It reads the current author source live and distinguishes package availability, freshness, duplicate IDs, marketplace provenance, and evidence gaps.
+`scripts/preflight-frontend-specialists.ps1` is the primary task-time check for required and triggered recommended specialists. It resolves the configured moving current channel live and distinguishes package availability, freshness, duplicate IDs, marketplace provenance, and evidence gaps.
 
 After live preflight, an install/update may be executed only when the user explicitly approves that exact specialist/action.
 
 Do not add a custom package-manager layer. Read the official channel and exact identity from `specialists.json`, then invoke the provider directly:
 
 - Codex-plugin providers: verify marketplace Git origin and catalog plugin source against the author's repository before update/install; a matching marketplace name alone is insufficient.
-- Provider CLI/installers: use the current distribution command declared in `specialists.json`; npm-based mutations explicitly request `@latest` where appropriate so local npx cache is not treated as current-version truth.
+- Provider CLI/installers: use the moving current channel declared in `specialists.json`; npm-based mutations explicitly request `@latest` where declared so local npx cache or repository `main` is not treated as current installable-version truth.
 
 Every mutation is single-provider, followed by live postflight. Never perform an unnamed/all-marketplace upgrade and never claim current-session activation from package files alone.
 
@@ -525,7 +525,7 @@ Before reporting completion, state:
 - code checks run;
 - browser checks run;
 - console status;
-- external specialist preflight status for every selected provider;
+- external specialist preflight status and resolved current channel for every selected provider;
 - any offered/approved install or update and whether a fresh-session activation check completed;
 - selected art-direction authority when design direction was in scope;
 - Taste/Impeccable role used, if any;
