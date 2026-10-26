@@ -2,7 +2,7 @@
 
 For tasks that create, modify, fix, review, test, or prepare user-facing browser UI, use the `frontend-production-qa` skill.
 
-This includes HTML, CSS, responsive layout, browser-side JavaScript, navigation, forms, interactive components, accessibility, visual fixes, frontend regressions, and frontend release preparation.
+This includes HTML, CSS, responsive layout, browser-side JavaScript, navigation, forms, interactive components, animation, transitions, gestures, accessibility, visual fixes, frontend regressions, and frontend release preparation.
 
 Do not apply this workflow to backend-only, database-only, infrastructure-only, data-processing, or documentation-only work unless the change directly affects rendered browser behavior.
 
