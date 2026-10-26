@@ -125,6 +125,36 @@ The bundled `frontend-visual-qa` documentation may refer to these optional adjac
 
 They are not required to run the production frontend workflow. When installed, use the Codex-compatible copies from `daymade/claude-code-skills` or an explicitly maintained fork.
 
+### Motion AI Kit
+
+The official Motion AI Kit provides the external `motion` skill plus hosted Motion MCP context.
+
+Upstream:
+
+https://github.com/motiondivision/ai-kit
+
+Documentation:
+
+https://motion.dev/docs/ai-kit
+
+Official installer:
+
+```powershell
+npx motion-ai
+```
+
+Official upgrade path:
+
+```powershell
+npx motion-ai@latest
+```
+
+Treat this as a **conditional external recommendation**, not as a required or bundled dependency. The installer can write skill files and MCP configuration, so do not run it silently from this plugin's bootstrap or updater.
+
+Use the specialist for substantial animation, transition orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, Motion API work, or animation performance diagnostics. Prefer CSS when CSS is sufficient.
+
+Do not install the Motion runtime package solely because the agent skill is present. Project dependency policy remains authoritative.
+
 ### Impeccable
 
 Install globally for Codex:
