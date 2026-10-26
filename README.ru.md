@@ -96,7 +96,7 @@ Inspo не становится источником дизайна сущест
 
 Он подключается условно для сложной анимации, enter/exit orchestration, layout motion, gestures, drag/reorder, scroll-linked effects, springs, работы с Motion API и диагностики animation performance.
 
-Это **recommended**, но не required и не bundled dependency. Suite проверяет Motion только тогда, когда задача действительно его триггерит. Актуальность читается из live author/distribution sources; версия Motion не закрепляется в нашем repository.
+Это **recommended**, но не required и не bundled dependency. Suite проверяет Motion только тогда, когда задача действительно его триггерит. Текущая устанавливаемая версия Motion определяется по npm dist-tag `latest`; версия Motion не закрепляется в нашем repository.
 
 Если Motion отсутствует или его payload отличается от текущего payload автора, оркестратор до применения предлагает точную provider-specific установку/обновление. Изменение окружения всё равно требует явного разрешения пользователя.
 
@@ -152,9 +152,9 @@ Accessibility specialist поддерживается внутри этого р
 .\scripts\preflight-frontend-specialists.ps1 -SkillId <exact-skill-id>
 ```
 
-Registry `skills/frontend-production-qa/specialists.json` хранит только identity provider-а, repository, install channel и live version/payload sources. **Текущие номера версий внешних skills в нём намеренно не хранятся.**
+Registry `skills/frontend-production-qa/specialists.json` хранит только identity provider-а, repository, install channel и moving **current channel**. **Текущие номера версий внешних skills в нём намеренно не хранятся.**
 
-Актуальность определяется во время preflight по текущему источнику автора. Для npm-distributed providers вроде Impeccable и Motion author manifest дополнительно сравнивается с текущей official distribution metadata, чтобы неопубликованное или рассинхронизированное состояние не выдавалось за доступное обновление.
+Для npm-distributed providers вроде Impeccable и Motion authoritative current installable release определяется по настроенному npm dist-tag `latest`. Default branch репозитория автора остаётся источником provenance, документации и payload/reference checks, но его package version не обязана совпадать с npm `latest`.
 
 Preflight различает, в частности, `INSTALLED_CURRENT`, `UPDATE_AVAILABLE`, `UPDATE_RECOMMENDED`, `MISSING`, `DISABLED`, `CONFLICT`, `PROVENANCE_UNKNOWN` и состояния с недостаточной remote/local evidence.
 
