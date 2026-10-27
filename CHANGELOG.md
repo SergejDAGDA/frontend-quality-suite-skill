@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.1
+
+Specialist preflight correctness and regression coverage after v1.5.0 (PR #12):
+
+- Distinguish a single directly installed Taste skill (`PROVENANCE_UNKNOWN`) from actual duplicate Skill IDs (`CONFLICT`), without claiming the direct installation is a verified native plugin.
+- Detect local duplicate specialists before contacting a remote provider. A provider outage cannot mask a real duplicate.
+- Compare installed Motion Skill content against the integrity-verified current `motion-ai` npm release tarball, not the potentially different upstream GitHub `main` file.
+- Normalize LF and CRLF line endings during Skill payload comparison to avoid false update recommendations on Windows.
+- Verify the moving provider channel before reporting a missing Motion or Impeccable installation. When npm currentness is unavailable, report `UNKNOWN_DISTRIBUTION` rather than offering an unverified install.
+- Add deterministic Windows regression tests for the ten agreed Taste/Motion/Impeccable preflight cases, including provider outages, duplicate ownership, payload mismatch, checksum failure and line-ending equivalence.
+
+No changes to skill identities, bundled visual/accessibility QA, design-routing authority, WCAG policy, provider installation commands or automatic-mutation rules. Publishing the release does not update an existing Codex Desktop installation.
+
 ## 1.5.0
 
 Conditional Taste art-direction routing:
