@@ -194,7 +194,7 @@ Author payload/reference source:
 
 The repository package version is not used as the installable-version authority.
 
-The installed Motion Skill does not expose a reliable local semantic version. Therefore preflight compares normalized Skill payload content with the author's current payload and reports `UPDATE_RECOMMENDED` when they differ.
+The installed Motion Skill has no reliable local semantic version. Preflight compares normalized Skill content with the integrity-verified tarball of the npm `latest` release. Differences from GitHub `main` do not imply that the npm installation is outdated. If release content or integrity cannot be verified, report `UNKNOWN_DISTRIBUTION` rather than recommending an update.
 
 Do not invent or persist a local Motion version.
 

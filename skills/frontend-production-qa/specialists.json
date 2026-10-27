@@ -103,12 +103,8 @@
         "url": "https://registry.npmjs.org/motion-ai/latest",
         "property": "version"
       },
-      "author_payload": {
-        "kind": "github-text",
-        "url": "https://raw.githubusercontent.com/motiondivision/ai-kit/main/plugins/motion/skills/motion/SKILL.md"
-      },
       "local_version": {
-        "kind": "payload-hash"
+        "kind": "npm-release-payload"
       },
       "install": {
         "executable": "npx",

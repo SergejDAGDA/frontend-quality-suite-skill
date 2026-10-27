@@ -143,9 +143,10 @@ foreach ($npmSpec in @($impeccable, $motion)) {
     }
 }
 
-if ($motion.local_version.kind -ne "payload-hash" -or
-    -not $motion.author_payload.url) {
-    throw "Motion must use author payload comparison instead of an invented local semantic version"
+if ($motion.local_version.kind -ne "npm-release-payload" -or
+    $motion.current_channel.package -ne "motion-ai" -or
+    $motion.PSObject.Properties["author_payload"]) {
+    throw "Motion must compare the published npm release payload, not GitHub main"
 }
 
 $preflight = Get-Content -LiteralPath $preflightPath -Raw

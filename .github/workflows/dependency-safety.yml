@@ -26,3 +26,6 @@ jobs:
       - name: Verify live specialist preflight and mutation boundaries
         shell: pwsh
         run: ./tests/test_specialist_preflight_policy.ps1
+      - name: Verify Taste ownership and Motion release preflight
+        shell: pwsh
+        run: ./tests/test_specialist_preflight_regressions.ps1

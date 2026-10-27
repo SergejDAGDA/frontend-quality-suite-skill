@@ -45,6 +45,52 @@ function Get-LiveText {
     }
 }
 
+function Get-LiveNpmSkillText {
+    param($Spec, [string]$Version)
+
+    # npm latest is the distribution authority; GitHub main may legitimately differ.
+    if ($Spec.current_channel.package -ne "motion-ai" -or $Version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') {
+        return $null
+    }
+    $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ("frontend-motion-preflight-" + [guid]::NewGuid().ToString("N"))
+    try {
+        $headers = @{ "User-Agent" = "frontend-quality-suite-preflight" }
+        $metadata = Invoke-RestMethod -Uri $Spec.current_channel.url -Headers $headers -Method Get -TimeoutSec 20
+        if ([string]$metadata.version -ne $Version) { return $null }
+
+        $tarballUrl = [string]$metadata.dist.tarball
+        $uri = [uri]$tarballUrl
+        if ($uri.Scheme -ne "https" -or $uri.Host -ne "registry.npmjs.org" -or
+            $uri.AbsolutePath -notmatch '^/motion-ai/-/motion-ai-[0-9A-Za-z.+-]+\.tgz$') {
+            return $null
+        }
+        $integrity = [string]$metadata.dist.integrity
+        if ($integrity -notmatch '^sha512-[A-Za-z0-9+/]+={0,2}$') { return $null }
+
+        [void][IO.Directory]::CreateDirectory($tempRoot)
+        $archive = Join-Path $tempRoot "release.tgz"
+        Invoke-WebRequest -Uri $tarballUrl -Headers $headers -OutFile $archive -TimeoutSec 30
+
+        $sha = [Security.Cryptography.SHA512]::Create()
+        try { $digest = [Convert]::ToBase64String($sha.ComputeHash([IO.File]::ReadAllBytes($archive))) }
+        finally { $sha.Dispose() }
+        if ($digest -cne $integrity.Substring(7)) { return $null }
+
+        $entry = "package/content/skills/motion/SKILL.md"
+        & tar -xzf $archive -C $tempRoot $entry 2>$null
+        if ($LASTEXITCODE -ne 0) { return $null }
+        $extracted = Join-Path $tempRoot "package\content\skills\motion\SKILL.md"
+        if (-not (Test-Path -LiteralPath $extracted -PathType Leaf)) { return $null }
+        return [IO.File]::ReadAllText($extracted, [Text.Encoding]::UTF8)
+    }
+    catch { return $null }
+    finally {
+        if (Test-Path -LiteralPath $tempRoot) {
+            Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 function Get-NormalizedHash {
     param([Parameter(Mandatory = $true)][string]$Text)
 
@@ -330,10 +376,18 @@ function Inspect-CodexPluginSpecialist {
     $direct = @($records | Where-Object { $_.Origin -notmatch '^PLUGIN_CACHE$' })
 
     if ($direct.Count -gt 0) {
-        $result.status = "CONFLICT"
-        $result.detail = "Direct user/project copies collide with a plugin-owned specialist."
-        $result.suggested_action = "Resolve duplicate ownership before install/update."
-        $result.evidence = @($direct | ForEach-Object { "$($_.SkillId): $($_.Path)" })
+        $cached = @($records | Where-Object { $_.Origin -eq "PLUGIN_CACHE" })
+        $result.evidence = @($records | ForEach-Object { "$($_.Origin): $($_.Path)" })
+        if ($direct.Count -gt 1 -or $cached.Count -gt 0) {
+            $result.status = "CONFLICT"
+            $result.detail = "Multiple copies of the same plugin-owned Skill ID were found."
+            $result.suggested_action = "Resolve duplicate ownership before use."
+        }
+        else {
+            $result.status = "PROVENANCE_UNKNOWN"
+            $result.detail = "One direct Skill copy exists, but the configured provider channel is the native plugin. No duplicate was found; package completeness and currentness are unverified."
+            $result.suggested_action = "Inspect the direct package and offer a targeted provider migration only with approval. Do not install a duplicate."
+        }
         return [pscustomobject]$result
     }
 
@@ -490,29 +544,26 @@ function Inspect-DirectSkillSpecialist {
         return [pscustomobject]$result
     }
 
-    if ($Spec.local_version.kind -eq "payload-hash") {
-        $liveText = Get-LiveText -Url $Spec.author_payload.url
-
-        if (-not $liveText) {
-            $result.status = "UNKNOWN_REMOTE"
-            $result.detail = "Could not read the author's current Skill payload."
-            $result.suggested_action = "Do not claim Motion is current; retry the author payload check."
+    if ($Spec.local_version.kind -eq "npm-release-payload") {
+        $releaseText = Get-LiveNpmSkillText -Spec $Spec -Version $result.current_version
+        if ($null -eq $releaseText) {
+            $result.status = "UNKNOWN_DISTRIBUTION"
+            $result.detail = "Could not verify the current npm release Skill payload and its integrity."
+            $result.suggested_action = "Retry the npm distribution check; do not reinstall based on GitHub main differences."
             return [pscustomobject]$result
         }
 
-        $authorHash = Get-NormalizedHash -Text $liveText
-
-        if ($record.Hash -eq $authorHash) {
+        $releaseHash = Get-NormalizedHash -Text $releaseText
+        if ($record.Hash -eq $releaseHash) {
             $result.status = "INSTALLED_CURRENT"
-            $result.detail = "Installed Skill payload matches the author's current payload."
-            $result.suggested_action = "Resolve the Skill ID and required MCP capability in the current session before use."
+            $result.detail = "Installed Skill payload matches the integrity-verified current npm release."
+            $result.suggested_action = "Resolve the Skill ID and MCP capability in the current session before use."
         }
         else {
             $result.status = "UPDATE_RECOMMENDED"
-            $result.detail = "Installed Skill payload differs from the author's current payload; this skill does not expose an installed semantic version."
-            $result.suggested_action = "Offer a refresh through the author's current installer before use; do not invent a local version number."
+            $result.detail = "Installed Skill payload differs from the integrity-verified current npm release."
+            $result.suggested_action = "Offer the targeted author installer after user approval."
         }
-
         return [pscustomobject]$result
     }
 
