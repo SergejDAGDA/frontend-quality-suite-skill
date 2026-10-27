@@ -96,7 +96,7 @@ Use it conditionally for substantial animation, enter/exit orchestration, layout
 
 It is **recommended, not required or bundled**. The suite checks Motion only when the task triggers it. The current installable Motion release is resolved from the npm `latest` dist-tag; no Motion version is pinned in this repository.
 
-When Motion is missing or differs from the current author payload, the orchestrator offers the exact provider update/install before use. Mutation still requires explicit user approval.
+When Motion is missing or differs from the integrity-verified current npm release payload, the orchestrator offers the exact provider update/install before use. Differences from GitHub `main` alone are not an update signal. Mutation still requires explicit user approval.
 
 The current provider installer is invoked as:
 
