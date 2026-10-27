@@ -22,8 +22,13 @@ function Test-CurrentChannel {
     param($Spec, [System.Collections.IDictionary]$Result)
     $script:remoteChecks++
     if (-not $script:remoteAvailable) {
-        $Result.status = "UNKNOWN_REMOTE"
+        $Result.status = if ($Spec.current_channel.kind -eq "npm-dist-tag") {
+            "UNKNOWN_DISTRIBUTION"
+        } else {
+            "UNKNOWN_REMOTE"
+        }
         $Result.detail = "Synthetic upstream outage"
+        $Result.suggested_action = "Retry the authoritative provider check before install/update."
         return $false
     }
     $Result.current_version = if ($Spec.key -eq "motion") { "14.2.0" } else { "2.1.5" }
@@ -128,6 +133,43 @@ try {
         Hash = (Get-NormalizedHash -Text $installedLfPayload)
     })
     Assert-State (Inspect-DirectSkillSpecialist -Spec $motion) "INSTALLED_CURRENT"
+
+    # Frozen acceptance matrix: absent provider with unavailable npm must never
+    # be reported MISSING or cause an unverified install recommendation.
+    $impeccable = [pscustomobject]@{
+        key = "impeccable"; class = "recommended"; skill_ids = @("impeccable")
+        repository = "pbakaus/impeccable"; channel = "provider-cli"; fresh_session_required = $true
+        current_channel = [pscustomobject]@{
+            kind = "npm-dist-tag"; package = "impeccable"; url = "https://registry.npmjs.org/impeccable/latest"
+        }
+        local_version = [pscustomobject]@{ kind = "skill-frontmatter" }
+    }
+    $installedMotion = $script:records[0]
+    $installedImpeccable = [pscustomobject]@{
+        Origin = "DIRECT_USER_LEGACY"; SkillId = "impeccable"
+        Path = "impeccable/SKILL.md"; Version = "4.3.1"
+    }
+    $script:remoteAvailable = $false
+    foreach ($provider in @($motion, $impeccable)) {
+        $script:records = @()
+        $row = Inspect-DirectSkillSpecialist -Spec $provider
+        Assert-State $row "UNKNOWN_DISTRIBUTION"
+        if ($row.suggested_action -match '(?i)^offer.*install') {
+            throw "$($provider.key) offered installation without current provider evidence"
+        }
+    }
+
+    $script:records = @($installedMotion)
+    Assert-State (Inspect-DirectSkillSpecialist -Spec $motion) "UNKNOWN_DISTRIBUTION"
+    $script:records = @($installedImpeccable)
+    Assert-State (Inspect-DirectSkillSpecialist -Spec $impeccable) "UNKNOWN_DISTRIBUTION"
+
+    $script:remoteAvailable = $true
+    foreach ($provider in @($motion, $impeccable)) {
+        $script:records = @()
+        Assert-State (Inspect-DirectSkillSpecialist -Spec $provider) "MISSING"
+    }
+    $script:records = @($installedMotion)
 
     # A real direct duplicate remains a conflict while npm is offline.
     $script:remoteAvailable = $false

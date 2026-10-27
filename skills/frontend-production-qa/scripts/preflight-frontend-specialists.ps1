@@ -489,13 +489,7 @@ function Inspect-DirectSkillSpecialist {
     $result = New-Result -Spec $Spec
     $records = @(Get-SkillRecords -Names @($Spec.skill_ids))
 
-    if ($records.Count -eq 0) {
-        $result.status = "MISSING"
-        $result.detail = "No readable Skill payload with the declared Skill ID was found."
-        $result.suggested_action = "Offer the author's current install path before use."
-        return [pscustomobject]$result
-    }
-
+    # A real local duplicate is a CONFLICT even when the provider is unreachable.
     if ($records.Count -gt 1) {
         $result.status = "CONFLICT"
         $result.detail = "Multiple copies of the same external Skill ID were found."
@@ -505,6 +499,14 @@ function Inspect-DirectSkillSpecialist {
     }
 
     if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
+        return [pscustomobject]$result
+    }
+
+    # MISSING can only be concluded after the live provider channel is verified.
+    if ($records.Count -eq 0) {
+        $result.status = "MISSING"
+        $result.detail = "No readable Skill payload with the declared Skill ID was found."
+        $result.suggested_action = "Offer the author's current install path before use."
         return [pscustomobject]$result
     }
 
