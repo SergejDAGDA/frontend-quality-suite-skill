@@ -16,8 +16,16 @@ foreach ($name in $functions) {
     if (-not (Get-Command $name -ErrorAction SilentlyContinue)) { throw "Missing $name" }
 }
 
+$script:remoteAvailable = $true
+$script:remoteChecks = 0
 function Test-CurrentChannel {
     param($Spec, [System.Collections.IDictionary]$Result)
+    $script:remoteChecks++
+    if (-not $script:remoteAvailable) {
+        $Result.status = "UNKNOWN_REMOTE"
+        $Result.detail = "Synthetic upstream outage"
+        return $false
+    }
     $Result.current_version = if ($Spec.key -eq "motion") { "14.2.0" } else { "2.1.5" }
     return $true
 }
@@ -46,11 +54,44 @@ $script:records = @($direct, [pscustomobject]@{
 })
 Assert-State (Inspect-CodexPluginSpecialist -Spec $taste) "CONFLICT"
 
+# Duplicate detection must remain authoritative when the provider manifest is offline.
+$script:remoteAvailable = $false
+$script:records = @($direct, $cached)
+$checksBefore = $script:remoteChecks
+Assert-State (Inspect-CodexPluginSpecialist -Spec $taste) "CONFLICT"
+if ($script:remoteChecks -ne $checksBefore) { throw "Duplicate detection must not depend on Taste network availability" }
+
+$script:records = @($direct, [pscustomobject]@{
+    Origin = "DIRECT_PROJECT"; SkillId = "design-taste-frontend"; Path = "project/SKILL.md"
+})
+Assert-State (Inspect-CodexPluginSpecialist -Spec $taste) "CONFLICT"
+if ($script:remoteChecks -ne $checksBefore) { throw "Direct-copy duplicates must not require a provider request" }
+
+$script:records = @($direct)
+Assert-State (Inspect-CodexPluginSpecialist -Spec $taste) "PROVENANCE_UNKNOWN"
+$script:records = @()
+Assert-State (Inspect-CodexPluginSpecialist -Spec $taste) "UNKNOWN_REMOTE"
+$script:remoteAvailable = $true
+
+# LF and CRLF versions of the same text must hash identically.
+$lfEnd = [string][char]10
+$crlfEnd = [string][char]13 + [char]10
+$lf = "first" + $lfEnd + "second" + $lfEnd + "third"
+$crlf = $lf.Replace($lfEnd, $crlfEnd)
+if ((Get-NormalizedHash -Text $lf) -cne (Get-NormalizedHash -Text $crlf)) {
+    throw "Get-NormalizedHash does not normalize Windows CRLF to LF"
+}
+$literalEscapes = 'first\nsecond\nthird'
+if ((Get-NormalizedHash -Text $lf) -ceq (Get-NormalizedHash -Text $literalEscapes)) {
+    throw "Get-NormalizedHash converted real line breaks to escaped text"
+}
+
 $temp = Join-Path ([IO.Path]::GetTempPath()) ("motion-npm-fixture-" + [guid]::NewGuid().ToString("N"))
 try {
     $dir = Join-Path $temp "package\content\skills\motion"
     [void][IO.Directory]::CreateDirectory($dir)
-    $payload = "---" + [Environment]::NewLine + "name: motion" + [Environment]::NewLine + "---" + [Environment]::NewLine + "Release fixture"
+    $payload = "---" + $crlfEnd + "name: motion" + $crlfEnd + "---" + $crlfEnd + "Release fixture"
+    $installedLfPayload = $payload.Replace($crlfEnd, $lfEnd)
     [IO.File]::WriteAllText((Join-Path $dir "SKILL.md"), $payload, [Text.Encoding]::UTF8)
     $script:archive = Join-Path $temp "release.tgz"
     & tar -czf $script:archive -C $temp "package/content/skills/motion/SKILL.md"
@@ -84,9 +125,21 @@ try {
     }
     $script:records = @([pscustomobject]@{
         Origin = "DIRECT_USER_LEGACY"; SkillId = "motion"; Path = "motion/SKILL.md"
-        Hash = (Get-NormalizedHash -Text $payload)
+        Hash = (Get-NormalizedHash -Text $installedLfPayload)
     })
     Assert-State (Inspect-DirectSkillSpecialist -Spec $motion) "INSTALLED_CURRENT"
+
+    # A real direct duplicate remains a conflict while npm is offline.
+    $script:remoteAvailable = $false
+    $script:records += [pscustomobject]@{
+        Origin = "DIRECT_PROJECT"; SkillId = "motion"; Path = "project/motion/SKILL.md"
+        Hash = (Get-NormalizedHash -Text $installedLfPayload)
+    }
+    $checksBefore = $script:remoteChecks
+    Assert-State (Inspect-DirectSkillSpecialist -Spec $motion) "CONFLICT"
+    if ($script:remoteChecks -ne $checksBefore) { throw "Motion duplicate detection must run before npm requests" }
+    $script:records = @($script:records[0])
+    $script:remoteAvailable = $true
 
     $script:records[0].Hash = Get-NormalizedHash -Text "different payload"
     Assert-State (Inspect-DirectSkillSpecialist -Spec $motion) "UPDATE_RECOMMENDED"

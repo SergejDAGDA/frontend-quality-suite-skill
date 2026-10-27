@@ -94,7 +94,7 @@ function Get-LiveNpmSkillText {
 function Get-NormalizedHash {
     param([Parameter(Mandatory = $true)][string]$Text)
 
-    $normalized = $Text -replace "\r\n", "\n"
+    $normalized = $Text -replace '\r\n', "`n"
     $bytes = [Text.Encoding]::UTF8.GetBytes($normalized)
     $sha = [Security.Cryptography.SHA256]::Create()
     try {
@@ -368,10 +368,6 @@ function Inspect-CodexPluginSpecialist {
     param($Spec)
 
     $result = New-Result -Spec $Spec
-    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
-        return [pscustomobject]$result
-    }
-
     $records = @(Get-SkillRecords -Names @($Spec.skill_ids))
     $direct = @($records | Where-Object { $_.Origin -notmatch '^PLUGIN_CACHE$' })
 
@@ -388,6 +384,10 @@ function Inspect-CodexPluginSpecialist {
             $result.detail = "One direct Skill copy exists, but the configured provider channel is the native plugin. No duplicate was found; package completeness and currentness are unverified."
             $result.suggested_action = "Inspect the direct package and offer a targeted provider migration only with approval. Do not install a duplicate."
         }
+        return [pscustomobject]$result
+    }
+
+    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
         return [pscustomobject]$result
     }
 
@@ -487,10 +487,6 @@ function Inspect-DirectSkillSpecialist {
     param($Spec)
 
     $result = New-Result -Spec $Spec
-    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
-        return [pscustomobject]$result
-    }
-
     $records = @(Get-SkillRecords -Names @($Spec.skill_ids))
 
     if ($records.Count -eq 0) {
@@ -505,6 +501,10 @@ function Inspect-DirectSkillSpecialist {
         $result.detail = "Multiple copies of the same external Skill ID were found."
         $result.suggested_action = "Resolve duplicate ownership before use or update."
         $result.evidence = @($records | ForEach-Object { "$($_.Origin): $($_.Path)" })
+        return [pscustomobject]$result
+    }
+
+    if (-not (Test-CurrentChannel -Spec $Spec -Result $result)) {
         return [pscustomobject]$result
     }
 
